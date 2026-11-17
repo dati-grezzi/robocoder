@@ -325,9 +325,11 @@ button:disabled{opacity:.35;cursor:default}
       <button class="big" id="certSave">⬇ Scarica PDF A4</button>
       <div id="certMsg"></div>
       <div class="badgeBox">
-        <b>🏷 Adesivi badge</b>
-        <select id="badgeShape" class="txt"><option value="tondo">Tondi Ø 64 mm · 12 per foglio</option><option value="rett">Rettangolari 85×55 mm · 10 per foglio</option></select>
-        <button class="sec" id="badgeBtn">⬇ Foglio di adesivi A4</button>
+        <b>🏷 Adesivi badge <small style="font-weight:400;color:var(--mute)">· 6 per foglio A4</small></b>
+        <select id="badgeShape" class="txt"><option value="tondo">Tondi Ø 90 mm</option><option value="rett">Rettangolari 98×86 mm</option></select>
+        <button class="sec" id="badgeBtn">⬇ 6 adesivi di questo robot</button>
+        <button class="sec" id="badgeAdd">➕ Aggiungi al foglio misto</button>
+        <div id="badgeMix" class="hidden" style="display:flex;gap:6px"><button class="sec" id="badgeMixBtn" style="flex:1">⬇ Foglio misto</button><button class="sec danger" id="badgeClear" title="Svuota il foglio misto">✕</button></div>
       </div>
       <button class="sec" id="certClose" style="margin-top:auto">Chiudi</button>
     </div>
@@ -1834,64 +1836,83 @@ function arcText(c,txt,cx,cy,r,size){        // testo lungo l'arco superiore di 
   for(let i=0;i<chars.length;i++){const a=ang+ws[i]/r/2;c.save();c.translate(cx+r*Math.cos(a),cy+r*Math.sin(a));c.rotate(a+Math.PI/2);c.fillText(chars[i],0,0);c.restore();ang+=ws[i]/r;}
   c.restore();
 }
-function binLines(perLine){const g=ID.bytes.map(b=>b.toString(2).padStart(8,'0')),out=[];for(let i=0;i<g.length;i+=perLine)out.push(g.slice(i,i+perLine).join(' '));return out;}
-function drawBadge(c,x,y,w,h,shape){
-  const tr=ID.traits,col=l=>`hsl(${tr.hue},70%,${l}%)`,top=EV().adesivo||'MESTICA';
+function binLines(I,perLine){const g=I.bytes.map(b=>b.toString(2).padStart(8,'0')),out=[];for(let i=0;i<g.length;i+=perLine)out.push(g.slice(i,i+perLine).join(' '));return out;}
+function drawBadge(c,x,y,w,h,shape,I){
+  const tr=I.traits,col=l=>`hsl(${tr.hue},70%,${l}%)`,top=EV().adesivo||'MESTICA';
   c.save();c.translate(x,y);
   if(shape==='tondo'){
     const R=w/2,cx=R,cy=R;
     c.fillStyle='#fff';c.beginPath();c.arc(cx,cy,R-2,0,Math.PI*2);c.fill();
-    c.strokeStyle=col(50);c.lineWidth=R*.07;c.beginPath();c.arc(cx,cy,R-R*.05,0,Math.PI*2);c.stroke();
-    c.strokeStyle=col(85);c.lineWidth=2;c.beginPath();c.arc(cx,cy,R*.88,0,Math.PI*2);c.stroke();
-    c.fillStyle='#1b1f45';arcText(c,top,cx,cy,R*.76,R*.15);
-    drawRobot(c,cx,cy-R*.06,R*.72,tr,{t:.3});
-    c.textAlign='center';c.textBaseline='alphabetic';c.fillStyle=col(40);fitText(c,ID.full,R*1.1,R*.12,'700','Fredoka,sans-serif');c.fillText(ID.full,cx,cy+R*.42);
-    const L=binLines(ID.bytes.length<=6?3:4),fs=Math.min(R*.085,(R*1.25)/(L[0].length*.62)),lh=fs*1.15;
+    c.strokeStyle=col(50);c.lineWidth=R*.06;c.beginPath();c.arc(cx,cy,R-R*.045,0,Math.PI*2);c.stroke();
+    c.strokeStyle=col(85);c.lineWidth=2;c.beginPath();c.arc(cx,cy,R*.89,0,Math.PI*2);c.stroke();
+    c.fillStyle='#1b1f45';arcText(c,top,cx,cy,R*.78,R*.12);
+    drawRobot(c,cx,cy-R*.2,R*.6,tr,{t:.3});
+    c.textAlign='center';c.textBaseline='alphabetic';
+    c.fillStyle='#1b1f45';fitText(c,I.show,R*1.45,R*.24,'700','Fredoka,sans-serif');c.fillText(I.show,cx,cy+R*.33);
+    c.fillStyle=col(40);fitText(c,I.full,R*1.2,R*.1,'600','Fredoka,sans-serif');c.fillText(I.full,cx,cy+R*.46);
+    const L=binLines(I,I.bytes.length<=6?3:4),fs=Math.min(R*.072,(R*1.2)/(L[0].length*.62)),lh=fs*1.15;
     c.font=`600 ${fs}px "JetBrains Mono",monospace`;c.fillStyle='#1b8fb5';
-    const y0=cy+R*.55;L.slice(0,3).forEach((l,i)=>c.fillText(l,cx,y0+i*lh));
+    const y0=cy+R*.58;L.slice(0,3).forEach((l,i)=>c.fillText(l,cx,y0+i*lh));
     if(L.length>3){c.fillStyle='#8a8fa3';c.fillText('…',cx,y0+3*lh);}
   }else{
-    const r=h*.09;
+    const r=h*.07;
     c.fillStyle='#fff';c.beginPath();c.roundRect(2,2,w-4,h-4,r);c.fill();
-    c.strokeStyle=col(50);c.lineWidth=h*.035;c.beginPath();c.roundRect(h*.02,h*.02,w-h*.04,h-h*.04,r);c.stroke();
-    c.fillStyle=col(50);c.beginPath();c.roundRect(h*.02,h*.02,w-h*.04,h*.2,[r,r,0,0]);c.fill();
-    c.fillStyle='#fff';c.textAlign='center';c.textBaseline='middle';fitText(c,top,w*.9,h*.12,'700','Fredoka,sans-serif');
-    if('letterSpacing' in c)c.letterSpacing=(h*.012)+'px';c.fillText(top,w/2,h*.12);if('letterSpacing' in c)c.letterSpacing='0px';
-    drawRobot(c,w*.22,h*.6,h*.6,tr,{t:.3});
-    c.textAlign='left';c.textBaseline='alphabetic';c.fillStyle='#1b1f45';fitText(c,ID.full,w*.54,h*.13,'700','Fredoka,sans-serif');c.fillText(ID.full,w*.42,h*.38);
-    const L=binLines(2),fs=Math.min(h*.075,(w*.54)/(L[0].length*.62)),lh=fs*1.2;
+    c.strokeStyle=col(50);c.lineWidth=h*.025;c.beginPath();c.roundRect(h*.015,h*.015,w-h*.03,h-h*.03,r);c.stroke();
+    c.fillStyle=col(50);c.beginPath();c.roundRect(h*.015,h*.015,w-h*.03,h*.15,[r,r,0,0]);c.fill();
+    c.fillStyle='#fff';c.textAlign='center';c.textBaseline='middle';fitText(c,top,w*.9,h*.09,'700','Fredoka,sans-serif');
+    if('letterSpacing' in c)c.letterSpacing=(h*.01)+'px';c.fillText(top,w/2,h*.09);if('letterSpacing' in c)c.letterSpacing='0px';
+    drawRobot(c,w/2,h*.4,h*.36,tr,{t:.3});
+    c.textAlign='center';c.textBaseline='alphabetic';
+    c.fillStyle='#1b1f45';fitText(c,I.show,w*.88,h*.13,'700','Fredoka,sans-serif');c.fillText(I.show,w/2,h*.71);
+    c.fillStyle=col(40);fitText(c,I.full,w*.8,h*.055,'600','Fredoka,sans-serif');c.fillText(I.full,w/2,h*.78);
+    const L=binLines(I,I.bytes.length<=8?4:5),fs=Math.min(h*.045,(w*.88)/(L[0].length*.62)),lh=fs*1.18;
     c.font=`600 ${fs}px "JetBrains Mono",monospace`;c.fillStyle='#1b8fb5';
-    const n=Math.min(L.length,5),y0=h*.5;L.slice(0,n).forEach((l,i)=>c.fillText(l,w*.42,y0+i*lh));
-    c.font=`600 ${fs*.9}px "JetBrains Mono",monospace`;c.fillStyle=col(40);
-    fitText(c,ID.bytes.map(hex2).join(' '),w*.54,fs*.9,'600','"JetBrains Mono",monospace');c.fillText(ID.bytes.map(hex2).join(' '),w*.42,Math.min(h*.9,y0+n*lh+fs*.3));
+    const y0=h*.845;L.slice(0,3).forEach((l,i)=>c.fillText(l,w/2,y0+i*lh));
   }
   c.restore();
 }
 const badgeCv=document.createElement('canvas');badgeCv.width=1654;badgeCv.height=2339;
-function renderBadgeSheet(shape){
+function renderBadgeSheet(shape,list){
   const c=badgeCv.getContext('2d');c.setTransform(1,0,0,1,0,0);c.fillStyle='#fff';c.fillRect(0,0,1654,2339);
-  const [bw,bh,cols,rows]=shape==='tondo'?[64*MM,64*MM,3,4]:[85*MM,55*MM,2,5];
+  const [bw,bh]=shape==='tondo'?[90*MM,90*MM]:[98*MM,86*MM],cols=2,rows=3;
   const gx=(1654-cols*bw)/(cols+1),gy=(2339-rows*bh)/(rows+1);
   for(let r=0;r<rows;r++)for(let k=0;k<cols;k++){
+    const I=list[r*cols+k];if(!I)continue;
     const x=gx+k*(bw+gx),y=gy+r*(bh+gy);
     c.strokeStyle='#d5d8e6';c.lineWidth=1;c.setLineDash([8,8]);c.beginPath();      // linea di taglio
-    if(shape==='tondo')c.arc(x+bw/2,y+bh/2,bw/2+6,0,Math.PI*2);else c.roundRect(x-6,y-6,bw+12,bh+12,bh*.1);
+    if(shape==='tondo')c.arc(x+bw/2,y+bh/2,bw/2+6,0,Math.PI*2);else c.roundRect(x-6,y-6,bw+12,bh+12,bh*.08);
     c.stroke();c.setLineDash([]);
-    drawBadge(c,x,y,bw,bh,shape);
+    drawBadge(c,x,y,bw,bh,shape,I);
   }
 }
-$('badgeBtn').onclick=async()=>{
+/* foglio misto: i robot di più persone sullo stesso foglio (resta su questo PC) */
+let badgeQueue=[];
+(async()=>{try{badgeQueue=(await idb.get('badgeQueue'))||[];}catch(e){}showMix();})();
+const queueIds=()=>badgeQueue.map(q=>makeIdentity(q.raw,q.k));
+function showMix(){const n=badgeQueue.length;$('badgeMix').classList.toggle('hidden',!n);$('badgeMixBtn').textContent=`⬇ Foglio misto (${n}/6)`;$('badgeAdd').disabled=n>=6;}
+async function saveQueue(){try{await idb.set('badgeQueue',badgeQueue);}catch(e){}showMix();}
+async function badgePdf(list,fname){
   const msg=$('certMsg'),shape=$('badgeShape').value;msg.className='';msg.textContent='Preparo gli adesivi…';
   try{
-    await document.fonts.ready;renderBadgeSheet(shape);
+    await document.fonts.ready;renderBadgeSheet(shape,list);
     $('certPrev').src=badgeCv.toDataURL('image/jpeg',.85);
     const blob=await new Promise(r=>badgeCv.toBlob(r,'image/jpeg',.93));
-    const pdf=pagesToPdf([{jpg:new Uint8Array(await blob.arrayBuffer()),w:1654,h:2339}],`Badge ${ID.kid}`);
-    const fname=`Badge_${ID.kid.replace(/ /g,'_')}_${ID.sigla}_${shape}.pdf`;
+    const pdf=pagesToPdf([{jpg:new Uint8Array(await blob.arrayBuffer()),w:1654,h:2339}],'Badge Robot Coder');
+    fname=fname.replace('.pdf',`_${shape}.pdf`);
     await downloadFile(fname,pdf);
     msg.className='ok';msg.innerHTML=`✅ Adesivi scaricati in <b>Download</b>:<br><small>${fname}</small><br>Stampa su carta adesiva A4 al <b>100%</b> (non "adatta alla pagina").`;sfx.ok();
-  }catch(e){console.error(e);msg.className='bad';msg.textContent='Errore nella creazione degli adesivi.';}
+    return true;
+  }catch(e){console.error(e);msg.className='bad';msg.textContent='Errore nella creazione degli adesivi.';return false;}
+}
+$('badgeBtn').onclick=()=>badgePdf(Array(6).fill(ID),`Badge_${ID.kid.replace(/ /g,'_')}_${ID.sigla}.pdf`);
+$('badgeAdd').onclick=async()=>{
+  if(badgeQueue.some(q=>q.raw===ID.show&&q.k===ID.serial)){$('certMsg').className='';$('certMsg').textContent='Questo robot è già nel foglio misto.';return;}
+  badgeQueue.push({raw:ID.show,k:ID.serial});await saveQueue();
+  renderBadgeSheet($('badgeShape').value,queueIds());$('certPrev').src=badgeCv.toDataURL('image/jpeg',.85);
+  $('certMsg').className='ok';$('certMsg').textContent=`➕ Aggiunto al foglio misto (${badgeQueue.length}/6).`+(badgeQueue.length<6?' Il prossimo tutor crea il suo robot e fa lo stesso.':' Il foglio è pieno: scaricalo.');
 };
+$('badgeMixBtn').onclick=async()=>{if(await badgePdf(queueIds(),`Badge_foglio_misto_${stamp()}.pdf`)){$('certMsg').innerHTML+='<br>Se è tutto a posto, svuota il foglio misto con ✕.';}};
+$('badgeClear').onclick=async()=>{badgeQueue=[];await saveQueue();$('certMsg').className='';$('certMsg').textContent='Foglio misto svuotato.';};
 
 async function openCert(){
   if(!ID)return;
@@ -1906,7 +1927,7 @@ async function openCert(){
 $('certBtn').onclick=openCert;$('certBtn2').onclick=openCert;
 $('certClose').onclick=()=>$('certModal').classList.remove('on');
 $('certModal').onclick=e=>{if(e.target.id==='certModal')$('certModal').classList.remove('on');};
-$('badgeShape').onchange=()=>{renderBadgeSheet($('badgeShape').value);$('certPrev').src=badgeCv.toDataURL('image/jpeg',.85);};
+$('badgeShape').onchange=()=>{renderBadgeSheet($('badgeShape').value,badgeQueue.length?queueIds():Array(6).fill(ID));$('certPrev').src=badgeCv.toDataURL('image/jpeg',.85);};
 $('certDraw').onchange=()=>{renderCert($('certDraw').checked);$('certPrev').src=certCv.toDataURL('image/jpeg',.85);};
 $('certSave').onclick=async()=>{
   const msg=$('certMsg');msg.className='';msg.textContent='Preparo il PDF…';
