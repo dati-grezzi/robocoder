@@ -24,7 +24,9 @@ Il bambino scrive il suo nome. L'app lo traduce in binario ed esadecimale e da q
 
 Su GitHub c'è solo il programma, nessun dato.
 - I ricordi (nome del bambino e disegno) vanno **solo** nella cartella Drive della scuola, attraverso lo script.
-- Lo script accetta solo richieste che contengono un codice. Il codice si inserisce sui PC e non è nel repository.
+- Sui PC non si configura niente. Salvare un ricordo è libero solo quando il docente apre la raccolta, e c'è un tetto giornaliero.
+- Leggere, unire e cancellare i ricordi richiede il codice docente, che non è nel repository.
+- Il registro anti-doppioni non contiene nomi: solo un'impronta cifrata.
 
 ## Licenza
 

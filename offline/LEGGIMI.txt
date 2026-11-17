@@ -33,10 +33,11 @@ A FINE GIORNATA
      (iniziano con la data di oggi) e copiarli sulla chiavetta,
      ad esempio nella cartella "Ricordi".
   2. Sul PC del docente: aprire Robot Coder, area docente
-     (Ctrl + Alt + D, poi PIN), "Unisci ricordi",
+     (Ctrl + Alt + D, poi codice docente), "Unisci ricordi",
      "Scegli file PDF" (o "Scegli cartella") -> cartella Ricordi
      della chiavetta -> "Crea PDF unico" -> stampare.
-     (La prima volta l'area docente chiede di creare un PIN.)
+     (Se quel PC non ha mai visto il codice e manca internet,
+      l'area docente chiede di creare un PIN valido solo li'.)
   3. Quando internet torna, si possono caricare i PDF nella cartella
      Drive "Ricordi Open Day" trascinandoli in drive.google.com.
 

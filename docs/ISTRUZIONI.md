@@ -14,17 +14,16 @@ Referente: prof. Al (matematica). Questo documento serve a chiunque debba gestir
 | Cosa | Dettaglio |
 |---|---|
 | Indirizzo dell'app | **https://datigrezzi.it/robocoder/** |
-| File di avvio | `avvio/Robot Coder.cmd` del repository: copiato sul desktop, apre l'app in una finestra senza barre (§ 4 B) |
 | Browser | **Google Chrome** o **Microsoft Edge** |
 | Internet | Necessario per aprire l'app e salvare su Drive. Se cade durante il laboratorio, l'app già aperta continua a funzionare e i ricordi vanno nella cartella Download del PC |
 | Account Google | `[DA COMPILARE: account dedicato della scuola]`: contiene lo script **Robot Coder Drive** e la cartella Drive **Ricordi Open Day**. **Non** va aperto sui PC del laboratorio |
 | Script "Robot Coder Drive" | File `apps-script/Codice.gs` del repository, pubblicato come App web dall'account dedicato (§ 4 A) |
-| URL dello script | `[DA COMPILARE: https://script.google.com/macros/s/…/exec]` (già inserito nell'app, se il prof. Al l'ha aggiunto a `index.html`) |
-| CODICE dello script | 12 caratteri, da inserire una volta su ogni PC. **Non scriverlo qui** (questo documento è pubblico): comunicarlo a voce. Si legge nel *Log di esecuzione* della funzione `setup` |
+| URL dello script | Già inserito nell'app (`DRIVE_URL_DEFAULT` in `index.html`): sui PC non va configurato niente |
+| CODICE docente | 12 caratteri: serve **solo** per entrare nell'area docente. **Non scriverlo qui** (questo documento è pubblico): comunicarlo a voce al tutor e a chi sostituisce. Si legge nel *Log di esecuzione* della funzione `setup` |
 | PC del laboratorio | `[DA COMPILARE: quanti / quali]` |
 | Stampante | `[DA COMPILARE: quale, dove]` |
 | Audio | Casse o, meglio, **cuffie** per ogni PC: il robot parla (vedi § 5) |
-| Chiavetta USB (riserva) | Con una copia di `RobotCoder.html` e una cartella vuota `Ricordi` |
+| Chiavetta USB (riserva) | Con la cartella `RobotCoder_offline` (§ 4 E), solo per il caso senza internet |
 
 ---
 
@@ -52,29 +51,30 @@ Google Drive dell'account dedicato
 
 ## 3. Area docente (riservata)
 
-Le funzioni del docente **non sono visibili ai bambini** e sono protette da un **PIN**.
+Le funzioni del docente **non sono visibili ai bambini** e si aprono solo con il **CODICE docente**.
 
 - **Come si apre:** premere **Ctrl + Alt + D** (in qualsiasi schermata), oppure **tenere premuto per 2 secondi** il titolo "Robot Coder" nella schermata iniziale.
-- **PIN:** la prima volta, su ogni PC, l'area chiede di **creare il PIN** (da 4 a 12 cifre). Usare lo stesso PIN su tutti i PC e comunicarlo **solo** allo studente tutor e a chi sostituisce.
-  PIN: `[DA COMPILARE — oppure comunicarlo a voce, non scriverlo su un foglio lasciato in laboratorio]`
+- **Codice:** scrivere il CODICE docente. Lo verifica lo script: **non va impostato su nessun PC** e non resta salvato (sul PC rimane solo un'impronta cifrata, che permette di entrare anche se poi manca internet).
 - Dopo **5 tentativi sbagliati** l'area si blocca per 1 minuto.
-- **Chiudi e blocca** (o il tasto **Esc**) richiude l'area: per riaprirla serve di nuovo il PIN.
+- **Chiudi e blocca** (o il tasto **Esc**) richiude l'area: per riaprirla serve di nuovo il codice.
 
 Contenuto dell'area docente:
 
 | Voce | A cosa serve |
 |---|---|
-| ☁ Cartella Drive → **Configura** | Inserire il **CODICE** dello script (una volta per PC; l'URL di solito è già inserito). Accanto compare ✓ collegata oppure ⚠ non raggiungibile |
+| ☁ Cartella Drive | Stato del collegamento: ✓ collegata oppure ⚠ non raggiungibile |
 | ☁ Cartella Drive → **Apri** | Apre la cartella Drive nel browser (serve essere collegati con l'account dedicato) |
 | ☁ Cartella Drive → **🖥 Collegamento sul desktop** | Crea sul desktop il file `Ricordi Open Day.url`: doppio clic → si apre la cartella Drive |
-| 📁 Cartella locale → **Scegli cartella** | Alternativa senza internet: salva i PDF in una cartella del PC o su chiavetta. Se Drive è collegato, ha la precedenza Drive |
+| 📥 **Raccolta dei ricordi** | Casella *aperta/chiusa*, vale **per tutti i PC**. Aperta: i PC salvano i ricordi su Drive. Chiusa: nessuno può caricare file su Drive (i ricordi vanno in Download). Tenerla **aperta solo nei giorni in cui si usa l'app** |
+| 📁 Cartella locale → **Scegli cartella** | Alternativa senza internet: salva i PDF in una cartella del PC o su chiavetta |
 | 🗂 **Unisci ricordi** | Crea il PDF unico da stampare (§ 7) |
-| 🎫 **Evento** | Sceglie l'intestazione del ricordo PDF e la scritta sotto il titolo: **Open Day 2026/27** (predefinito) oppure **Laboratorio di coding** (attestato generico, per l'uso in classe dopo l'Open Day). Vale per quel PC e resta memorizzato |
-| 📋 Registro robot | Quanti robot sono stati creati su questo PC e in totale |
+| 🎫 **Evento** | Sceglie intestazione e titolo del ricordo PDF: **Open Day 2026/27** (predefinito) oppure **Laboratorio di coding**. Vale **per tutti i PC** (si aggiornano alla riapertura) |
+| 📋 Registro robot | Quanti robot sono registrati su Drive e su questo PC |
 | 🧹 Azzera il registro → **Solo questo PC** / **Tutti i PC** | Cancella l'elenco dei robot già creati. Va usato **dopo le prove e prima dell'open day**, **mai durante**. Chiede conferma con un secondo clic |
-| 🔑 **Cambia PIN** | Cambia il PIN su questo PC |
 
-**PIN dimenticato:** su quel PC, in Chrome/Edge: *Impostazioni → Privacy → Elimina dati di navigazione → "Cookie e altri dati dei siti"*. Attenzione: si cancella anche il registro locale di quel PC (non i PDF né il registro su Drive). Poi riaprire il file e creare un nuovo PIN.
+**Senza internet:** su un PC dove il docente è già entrato almeno una volta, il codice funziona anche offline. Su un PC mai usato, senza internet l'app chiede di creare un **PIN locale** valido solo su quel PC.
+
+**Cambiare il codice** (es. se un bambino l'ha visto): in script.google.com eseguire la funzione **`nuovoCodice`**. Il nuovo codice vale subito su tutti i PC.
 
 ---
 
@@ -101,20 +101,19 @@ Per un nuovo evento (es. Open Day 2027/28) si aggiunge una riga all'elenco `EVEN
    Nel **Log di esecuzione** compaiono il link della cartella **Ricordi Open Day** (creata ora) e il **CODICE**.
 4. **Esegui il deployment → Nuovo deployment** → ingranaggio → **App web**:
    - *Esegui come:* **Me** ← i ricordi vanno nel Drive di chi esegue
-   - *Chi ha accesso:* **Chiunque** ← i PC non accedono a Google; lo script accetta solo richieste con il CODICE
+   - *Chi ha accesso:* **Chiunque** ← i PC non accedono a Google; salvare i ricordi è libero (solo con la raccolta aperta), tutto il resto richiede il CODICE
    → copiare l'**URL** `/exec`.
-5. Inserire l'URL nell'app: comunicarlo al prof. Al, che lo scrive in `index.html` (`DRIVE_URL_DEFAULT`) e lo pubblica su GitHub. In alternativa si inserisce su ogni PC con **Configura** (punto B3).
+5. L'URL va scritto in `index.html` (`DRIVE_URL_DEFAULT`) e pubblicato su GitHub. **È già fatto** per lo script attuale.
 6. **Aggiornare lo script in futuro:** *Gestisci deployment → ✏ → Nuova versione*. Così l'URL non cambia. (Non usare "Nuovo deployment".)
-7. Per cambiare il CODICE (es. se è stato diffuso): eseguire **`nuovoCodice`** e reinserirlo su tutti i PC.
+7. Per cambiare il CODICE (es. se è stato diffuso): eseguire **`nuovoCodice`**. Vale subito ovunque.
 
-**B. Ogni PC del laboratorio (2 minuti a PC)**
+**B. Ogni PC del laboratorio: niente da fare**
 
-1. **Icona sul desktop** — uno dei due modi:
-   - copiare sul desktop il file **`Robot Coder.cmd`** (cartella `avvio` del repository, da chiavetta). Doppio clic → l'app si apre in una **finestra senza barre** (Chrome, oppure Edge). Per un attimo può comparire una finestrella nera: è normale. La prima volta Windows potrebbe mostrare *"Windows ha protetto il PC"* → *Ulteriori informazioni → Esegui comunque*;
-   - oppure aprire Chrome, scrivere **datigrezzi.it/robocoder** → ⋮ → **Trasmetti, salva e condividi → Crea scorciatoia…** → spuntare **Apri come finestra**.
-2. Aprire l'app → **area docente** (**Ctrl + Alt + D**) → **creare il PIN** (lo stesso su tutti i PC).
-3. **☁ Cartella Drive → Configura** → inserire il **CODICE** (e l'URL `/exec`, se il campo è vuoto) → **Salva e prova**: deve comparire *«Ricordi Open Day» ✓ collegata*.
-4. **Sul PC del docente:** **🖥 Collegamento sul desktop** → scegliere il Desktop → salvare. Doppio clic → si apre la cartella Drive (accedere con l'account dedicato **solo su quel PC**).
+Non c'è niente da installare né da configurare: basta aprire Chrome (o Edge) e andare su **datigrezzi.it/robocoder**.
+
+Facoltativo, per comodità:
+- **icona sul desktop:** su quella pagina, in Chrome: ⋮ → **Trasmetti, salva e condividi → Crea scorciatoia…** → spuntare **Apri come finestra** → l'app si apre in una finestra pulita senza barre;
+- **sul PC del docente:** area docente → **🖥 Collegamento sul desktop** per avere la cartella Drive a portata di doppio clic.
 
 **C. Prova generale (10 minuti)**
 
@@ -151,13 +150,11 @@ Se invece internet cade **a metà giornata** con l'app già aperta, non serve la
 
 Su **ogni PC**:
 
-1. Doppio clic su **Robot Coder** sul desktop.
-2. Aprire l'area docente (**Ctrl + Alt + D** + PIN) e controllare la riga **☁ Cartella Drive**:
-   - `«Ricordi Open Day» ✓ collegata` → tutto a posto.
-   - `⚠ non raggiungibile` → controllare internet; vedi § 8. Si può comunque partire: i ricordi andranno in Download.
-   - `non configurata` → **Configura** e inserire il CODICE (§ 4 B).
-3. Opzionale: mettere il browser a schermo intero con **F11**.
-4. **Chiudi e blocca** l'area docente prima di lasciare il PC ai bambini.
+1. Aprire **datigrezzi.it/robocoder** (o l'icona, se creata).
+2. Opzionale: mettere il browser a schermo intero con **F11**.
+
+**Una volta sola, da un PC qualsiasi:** area docente (**Ctrl + Alt + D** + codice) → controllare *☁ «Ricordi Open Day» ✓ collegata*, **📥 Raccolta: aperta**, **🎫 Evento: Open Day 2026/27** → **Chiudi e blocca**.
+
 5. Verificare l'audio. Il robot **parla**: ogni messaggio `di("…")` viene scritto e detto ad alta voce, e ogni robot ha un tono di voce diverso. In alto ci sono due tasti:
    - **🗣 Voce / 🤐 Voce** accende o spegne la voce del robot;
    - **🔊 / 🔇** accende o spegne i suoni (bip, errori).
@@ -193,7 +190,7 @@ Su **ogni PC**:
 Dal PC del docente (o da qualsiasi PC con Chrome/Edge):
 
 1. Aprire **Robot Coder** dall'icona.
-2. Area docente (**Ctrl + Alt + D** + PIN) → **Unisci ricordi**.
+2. Area docente (**Ctrl + Alt + D** + codice) → **Unisci ricordi**.
 3. **☁ Dalla cartella Drive** → l'app legge tutti i ricordi della cartella Drive.
    In alternativa: **📄 Scegli file PDF** e selezionare i file a mano (ad esempio quelli finiti in Download sui singoli PC), oppure **📁 Scegli cartella** per una cartella locale.
 4. **⬇ Crea PDF unico** → viene creato `Ricordi_OpenDay_<data-ora>_<N>pagine.pdf`, una pagina A4 per bambino: viene **scaricato in Download** (pronto per la stampa) e **salvato anche nella cartella Drive**.
@@ -210,8 +207,8 @@ L'unione ignora automaticamente i file che non sono ricordi e i PDF già uniti, 
 | Cosa succede | Cosa fare |
 |---|---|
 | Messaggio arancione **"La cartella Drive non risponde, ma il ricordo non è perso"** | Il PDF è nella cartella **Download** di quel PC. In alto compare un avviso giallo con il numero di file finiti lì. Il lavoro continua normalmente. Quando internet torna, l'app si ricollega da sola (entro un minuto). A fine giornata caricare quei PDF nella cartella Drive, oppure selezionarli a mano in "Unisci ricordi". |
-| L'icona **non apre l'app** | Controllare internet. Provare ad aprire **datigrezzi.it/robocoder** in Chrome. Se GitHub non risponde: usare il file di riserva (§ 4 E). |
-| Area docente: Drive **⚠ non raggiungibile (codice errato)** | Il CODICE inserito non è quello dello script: **Configura** e reinserirlo. |
+| L'app **non si apre** | Controllare internet. Provare ad aprire **datigrezzi.it/robocoder** in Chrome. Se GitHub non risponde: usare la chiavetta (§ 4 E). |
+| I ricordi vanno in Download anche se internet funziona | La **raccolta** è chiusa: area docente → 📥 spuntare *aperta*. |
 | Area docente: Drive **⚠ non raggiungibile (risposta non valida)** | URL dello script sbagliato o deployment rimosso: verificare l'URL `/exec` in script.google.com → *Gestisci deployment*. |
 | Area docente: Drive **⚠ non raggiungibile** (altro) | Controllare internet sul PC. Se non si risolve si va avanti: i PDF vanno in Download. |
 | Il collegamento sul desktop chiede di accedere a Google | Normale: la cartella è nel Drive dell'account dedicato. Accedere con quell'account **solo sul PC del docente**. |
@@ -219,10 +216,10 @@ L'unione ignora automaticamente i file che non sono ricordi e i PDF già uniti, 
 | Il robot **non si muove** / il codice è un disastro | **↺ Ripristina** riporta il codice iniziale. |
 | Il robot **gira all'infinito** | **■ Stop**. |
 | Un bambino ha chiuso la pagina per sbaglio | Riaprire dall'icona, riscrivere il nome, scegliere **"✋ Sono io"**: ritrova lo stesso robot. Il disegno però va rifatto. |
-| La pagina si blocca | Chiudere la finestra e riaprire dall'icona. PIN e registro restano memorizzati. |
+| La pagina si blocca | Chiudere la finestra e riaprire. Il registro resta memorizzato. |
 | L'area docente non si apre con Ctrl + Alt + D | Usare la pressione lunga (2 s) sul titolo "Robot Coder" nella schermata iniziale (👋 Nuovo bambino per tornarci). |
-| Un bambino ha trovato l'area docente | Senza PIN non può fare nulla. Se il PIN è stato visto: area docente → **Cambia PIN** su ogni PC. |
-| PIN dimenticato | Vedi § 3. |
+| Un bambino ha trovato l'area docente | Senza codice non può fare nulla. Se il codice è stato visto: eseguire **`nuovoCodice`** in script.google.com (§ 3). |
+| Codice dimenticato | In script.google.com (account dedicato) eseguire **`setup`**: il log mostra il codice attuale. |
 | Il robot non parla | Tasto **🗣 Voce** acceso? Volume del PC? Voce italiana installata in Windows (*Impostazioni → Ora e lingua → Voce*)? Senza voce l'app funziona comunque. |
 | Troppo rumore in aula | Spegnere la voce con **🗣 Voce** sui PC senza cuffie. |
 | I caratteri sembrano diversi dal solito | Normale senza internet: l'app usa un carattere di sistema. Tutto funziona lo stesso. |
@@ -331,7 +328,9 @@ Nei **poligoni l'angolo non è scritto**: il bambino deve scoprirlo. Ogni sfida 
 ## 11. Dati e privacy
 
 - L'app è pubblicata su GitHub ma **non invia nulla a GitHub**: i ricordi vanno **solo** allo script dell'account dedicato della scuola, che li salva nella cartella Drive (Google Workspace della scuola). Nessun altro servizio riceve dati.
-- Nei file compaiono **solo il nome** del bambino (niente cognome se non viene scritto) e l'orario.
+- Nei PDF compaiono **solo il nome** del bambino (niente cognome se non viene scritto) e l'orario.
+- Il registro anti-doppioni **non contiene nomi**: solo un'impronta cifrata (SHA-256) del nome e il nome del robot.
+- Lo script accetta caricamenti senza codice solo con la **raccolta aperta** e al massimo 400 al giorno; leggere, unire o cancellare i ricordi richiede il codice docente.
 - Dopo l'Open Day, una volta stampati i ricordi, si possono **cancellare** i PDF dalla cartella Drive e il file `_registro.json`. Volendo, si può anche disattivare lo script (*Gestisci deployment → Archivia*).
 
 ---
@@ -341,9 +340,10 @@ Nei **poligoni l'angolo non è scritto**: il bambino deve scoprirlo. Ogni sfida 
 - Tutto è nel repository **https://github.com/dati-grezzi/robocoder**:
   - `index.html` — l'app (pubblicata automaticamente su GitHub Pages);
   - `apps-script/Codice.gs` — lo script Drive (da copiare in script.google.com, § 4 A);
-  - `avvio/` — i file di avvio da copiare sul desktop dei PC;
+  - `avvio/` — file di avvio facoltativi (finestra senza barre);
   - `offline/` — avvio e istruzioni del paracadute senza internet (§ 4 E);
   - `docs/ISTRUZIONI.md` — questo documento;
   - `legacy/RobotCoder_v1.html` — versione precedente, solo per emergenza.
-- **Aggiornamenti dell'app:** si pubblicano su GitHub e arrivano a tutti i PC alla riapertura (Ctrl + F5 per forzare). PIN, codice e registro restano memorizzati sui PC.
+- **Aggiornamenti dell'app:** si pubblicano su GitHub e arrivano a tutti i PC alla riapertura (Ctrl + F5 per forzare).
+- **Aggiornamenti dello script:** incollare il nuovo `apps-script/Codice.gs` in script.google.com → *Gestisci deployment → ✏ → Nuova versione* (l'URL non cambia).
 - GitHub conserva la cronologia: ogni versione precedente si può recuperare.

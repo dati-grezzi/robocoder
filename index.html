@@ -246,8 +246,8 @@ button:disabled{opacity:.35;cursor:default}
   <div class="mbox tbox">
     <h3>🔒 Area docente</h3>
     <div id="tLock" class="tview">
-      <p>Inserisci il PIN docente.</p>
-      <input id="tPin" class="pin" type="password" inputmode="numeric" autocomplete="off" maxlength="12">
+      <p>Inserisci il <b>codice docente</b>.</p>
+      <input id="tPin" class="pin" type="password" autocomplete="off" spellcheck="false" maxlength="40">
       <button class="big" id="tEnter">Entra</button>
       <div class="tmsg" id="tLockMsg"></div>
     </div>
@@ -259,17 +259,13 @@ button:disabled{opacity:.35;cursor:default}
       <div class="tmsg" id="tCreateMsg"></div>
     </div>
     <div id="tPanel" class="tview hidden">
-      <div class="trow"><div>☁ Cartella Drive: <b id="drvName">non configurata</b></div><button class="sec" id="drvCfg">Configura</button><a class="sec hidden" id="drvOpen" target="_blank" rel="noopener" style="text-decoration:none">Apri</a><button class="sec hidden" id="drvLink">🖥 Collegamento sul desktop</button></div>
-      <div class="trow hidden" id="drvForm"><div style="flex-basis:100%;display:flex;flex-direction:column;gap:6px">
-        <label>URL dello script (finisce con /exec) <small>— di solito è già inserito</small><input id="drvUrl" class="txt" spellcheck="false" autocomplete="off"></label>
-        <label>Codice<input id="drvTok" class="txt" spellcheck="false" autocomplete="off"></label>
-        <div style="display:flex;gap:8px"><button class="sec" id="drvSave">Salva e prova</button><button class="sec danger" id="drvClear">Scollega</button></div></div></div>
+      <div class="trow"><div>☁ Cartella Drive: <b id="drvName">…</b></div><a class="sec hidden" id="drvOpen" target="_blank" rel="noopener" style="text-decoration:none">Apri</a><button class="sec hidden" id="drvLink">🖥 Collegamento sul desktop</button></div>
+      <div class="trow"><div>📥 Raccolta dei ricordi su Drive <small>(chiusa = i PC non possono caricare)</small></div><label style="display:flex;gap:8px;align-items:center;cursor:pointer"><input type="checkbox" id="racBox" style="width:22px;height:22px;accent-color:var(--acc)"> <b id="racTxt">…</b></label></div>
       <div class="trow"><div>📁 Cartella locale <small>(alternativa a Drive)</small>: <b id="dirName">…</b></div><button class="sec" id="dirBtn">Scegli cartella</button></div>
       <div class="trow"><div>🗂 Ricordi della giornata</div><button class="sec" id="mergeBtn">Unisci ricordi</button></div>
-      <div class="trow"><div>🎫 Evento <small>(cambia il ricordo PDF)</small></div><select id="evSel" class="txt" style="width:auto;flex:1;min-width:220px"></select></div>
+      <div class="trow"><div>🎫 Evento <small>(cambia il ricordo PDF, vale per tutti i PC)</small></div><select id="evSel" class="txt" style="width:auto;flex:1;min-width:220px"></select></div>
       <div class="trow"><div>📋 Registro robot: <b id="tRegInfo">…</b></div></div>
       <div class="trow"><div>🧹 Azzera il registro <small>(dopo le prove, prima dell'open day)</small></div><button class="sec danger" id="tResetLocal">Solo questo PC</button><button class="sec danger" id="tResetAll">Tutti i PC</button></div>
-      <div class="trow"><div>🔑 PIN docente</div><button class="sec" id="tChangePin">Cambia PIN</button></div>
       <div class="tmsg" id="tPanelMsg"></div>
     </div>
     <button class="sec" id="tClose">Chiudi e blocca</button>
@@ -640,35 +636,33 @@ $('makeBtn').onclick=async()=>{
   if(c.replace(/ /g,'').length<2){$('nameMsg').textContent='Scrivi almeno 2 lettere 🙂';return;}
   $('nameMsg').textContent='';$('makeBtn').disabled=true;$('makeBtn').textContent='Controllo il registro…';
   try{
-    const reg=await fullRegistry();
-    const same=reg.filter(e=>e.name===c.toLowerCase()).sort((a,b)=>a.t-b.t);
-    if(same.length){askWho(raw,same,reg);return;}
-    await createNew(raw,reg);
+    const L=await regLookup(c.toLowerCase());
+    if(L.same.length){askWho(raw,L);return;}
+    await createNew(raw,L);
   }finally{$('makeBtn').disabled=false;$('makeBtn').textContent='Crea il mio robot ⚡';}
 };
-async function createNew(raw,reg){
-  const name=cleanName(raw).toLowerCase();
-  const usedK=new Set(reg.filter(e=>e.name===name).map(e=>e.k));
-  const fulls=new Set(reg.map(e=>e.full)),sigs=new Set(reg.map(e=>e.sig));
+async function createNew(raw,L){
+  const usedK=new Set(L.same.map(e=>e.k)),fulls=L.fulls,sigs=L.sigs;
   let id=null;
   for(let k=1;k<=255;k++){if(usedK.has(k))continue;const t=makeIdentity(raw,k);if(!fulls.has(t.full)&&!sigs.has(t.sig)){id=t;break;}}
   ID=id||makeIdentity(raw,Math.min(255,usedK.size+1));
   await register(ID);
   startReveal();
 }
-function askWho(raw,same,reg){
+function askWho(raw,LK){
+  const same=LK.same;
   const nm=makeIdentity(raw).show;
   $('whoText').innerHTML=same.length===1?`C'è già un robot per <b>${esc(nm)}</b>. Sei tu?`:`Ci sono già ${same.length} robot per <b>${esc(nm)}</b>. Uno di questi è tuo?`;
-  const L=$('whoList');L.innerHTML='';
+  const WL=$('whoList');WL.innerHTML='';
   for(const e of same){
     const b=document.createElement('button');b.className='sec';b.style.textAlign='left';
     const when=new Date(e.t).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
     b.innerHTML=`✋ Sono io: <b>${esc(e.full)}</b> <small style="color:var(--mute)">· ${esc(e.pc)} alle ${when}</small>`;
     b.onclick=()=>{$('whoModal').classList.remove('on');ID=makeIdentity(raw,e.k);startReveal();};
-    L.appendChild(b);
+    WL.appendChild(b);
   }
   $('whoNew').textContent=`No, sono un'altra persona di nome ${nm}`;
-  $('whoNew').onclick=async()=>{$('whoModal').classList.remove('on');await createNew(raw,reg);};
+  $('whoNew').onclick=async()=>{$('whoModal').classList.remove('on');await createNew(raw,LK);};
   $('whoModal').classList.add('on');
 }
 
@@ -1480,7 +1474,9 @@ let evId=EVENTO_PREDEFINITO;
 const EV=()=>EVENTI[evId]||EVENTI[EVENTO_PREDEFINITO];
 function showEvent(){$('evBadge').textContent=EV().badge;const sel=$('evSel');if(sel)sel.value=evId;}
 (()=>{const sel=$('evSel');sel.innerHTML=Object.entries(EVENTI).map(([k,e])=>`<option value="${k}">${e.nome}</option>`).join('');
-  sel.onchange=async()=>{evId=sel.value;try{await idb.set('evento',evId);}catch(e){}showEvent();const m=$('tPanelMsg');m.className='tmsg ok';m.textContent='✅ Evento: '+EV().nome+'. I prossimi ricordi useranno questa intestazione.';};
+  sel.onchange=async()=>{evId=sel.value;try{await idb.set('evento',evId);}catch(e){}showEvent();const m=$('tPanelMsg');
+    if(driveOn()&&ADMIN.code){try{await driveCall('setConfig',{evento:evId},12000,true);m.className='tmsg ok';m.textContent='✅ Evento: '+EV().nome+', per tutti i PC (gli altri si aggiornano alla riapertura).';return;}catch(e){}}
+    m.className='tmsg ok';m.textContent='✅ Evento: '+EV().nome+' (solo su questo PC).';};
   showEvent();})();
 const SCUOLA='Istituto “Enrico Mestica”';
 const CITTA='Civitanova Marche';
@@ -1671,57 +1667,51 @@ async function downloadFile(fname,blob){
 /* =========================================================
    PONTE DRIVE (Apps Script dell'account dedicato della scuola)
    ========================================================= */
-const DRIVE_URL_DEFAULT='';     // facoltativo: incolla qui l'URL /exec per non doverlo inserire su ogni PC
-const DRIVE_TOKEN_DEFAULT='';   // facoltativo: il CODICE dello script
-const DRV={url:DRIVE_URL_DEFAULT,token:DRIVE_TOKEN_DEFAULT,folderUrl:null,folderName:null,ok:null};
-const GAS=typeof google!=='undefined'&&google.script&&google.script.run;   // pagina servita come web app Apps Script
-const driveOn=()=>!!(GAS||(DRV.url&&DRV.token));
-async function driveCall(action,data={},ms=15000){
+const DRIVE_URL_DEFAULT='https://script.google.com/macros/s/AKfycbx336GjlVqkwt_QkA37hHrdyYfpnDZwhrxKbhYmmZTyBfP1gaJSgRkS0XGb8YWByr5I/exec';   // script Drive della scuola (non è segreto)
+const DRV={url:DRIVE_URL_DEFAULT,folderUrl:null,folderName:null,ok:null,raccolta:null};
+const ADMIN={code:null};        // codice docente: solo in memoria, mai salvato sul PC
+const driveOn=()=>!!DRV.url;
+async function driveCall(action,data={},ms=15000,admin=false){
   if(navigator.onLine===false)throw new Error('nessuna connessione a internet');   // rete assente: subito al paracadute, senza attese
-  if(GAS){
-    const j=await withTimeout(new Promise((res,rej)=>google.script.run.withSuccessHandler(res).withFailureHandler(e=>rej(new Error(e&&e.message||'errore dello script'))).api({action,...data})),ms);
-    if(!j||!j.ok)throw new Error(j&&j.err||'errore dello script');
-    return j;
-  }
-  const r=await withTimeout(fetch(DRV.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({token:DRV.token,action,...data}),redirect:'follow'}),ms);
+  const body={action,...data};if(admin)body.token=ADMIN.code;
+  const r=await withTimeout(fetch(DRV.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body),redirect:'follow'}),ms);
   if(!r.ok)throw new Error('risposta '+r.status);
-  let j;try{j=await r.json();}catch(e){throw new Error('risposta non valida: controlla l\'URL');}
+  let j;try{j=await r.json();}catch(e){throw new Error('risposta non valida dello script');}
   if(!j.ok)throw new Error(j.err||'errore dello script');
   return j;
 }
+async function nameHash(n){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('robocoder|'+n));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');}
 function blobToB64(blob){return new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>res(String(fr.result).split(',')[1]);fr.onerror=()=>rej(fr.error);fr.readAsDataURL(blob);});}
 function b64ToBytes(b){const s=atob(b),u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u;}
-async function saveDriveCfg(){try{await idb.set('drive',{url:DRV.url,token:DRV.token,folderUrl:DRV.folderUrl,folderName:DRV.folderName});}catch(e){}}
 async function drivePing(){
   if(!driveOn()){showDrive();return false;}
   DRV.ok=null;showDrive();
-  try{const j=await driveCall('ping',{},12000);DRV.folderUrl=j.folderUrl;DRV.folderName=j.folderName;DRV.ok=true;saveDriveCfg();flushReg();}
+  try{const j=await driveCall('ping',{},12000,!!ADMIN.code);DRV.folderName=j.folderName;if(j.folderUrl)DRV.folderUrl=j.folderUrl;DRV.ok=true;applyServerConfig(j);flushReg();}
   catch(e){DRV.ok=false;DRV.err=e.message;}
   showDrive();return DRV.ok;
 }
+function applyServerConfig(j){
+  if(j.raccolta!=null)DRV.raccolta=!!j.raccolta;
+  if(j.evento&&EVENTI[j.evento]&&j.evento!==evId){evId=j.evento;try{idb.set('evento',evId);}catch(e){}showEvent();}   // l'evento lo decide il docente, per tutti i PC
+  showRaccolta();
+}
+function showRaccolta(){const b=$('racBox');if(!b)return;b.checked=DRV.raccolta!==false;b.disabled=!ADMIN.code||DRV.ok!==true;$('racTxt').textContent=DRV.raccolta===false?'chiusa':DRV.raccolta===true?'aperta':'…';}
 function showDrive(){
   const n=$('drvName');if(!n)return;
-  $('drvCfg').classList.toggle('hidden',!!GAS);
-  $('mDrive').classList.toggle('hidden',!driveOn());
-  if(!driveOn()){n.textContent='non configurata';$('drvOpen').classList.add('hidden');$('drvLink').classList.add('hidden');return;}
+  $('mDrive').classList.toggle('hidden',!(driveOn()&&ADMIN.code));
   n.innerHTML=DRV.ok===true?`«${esc(DRV.folderName||'Drive')}» <span style="color:var(--ok)">✓ collegata</span>`:DRV.ok===false?`<span style="color:var(--err)">⚠ non raggiungibile${DRV.err?' ('+esc(DRV.err)+')':''}</span>`:'controllo…';
-  const has=!!DRV.folderUrl;$('drvOpen').classList.toggle('hidden',!has);$('drvLink').classList.toggle('hidden',!has);if(has)$('drvOpen').href=DRV.folderUrl;
+  const has=!!(DRV.folderUrl&&ADMIN.code);$('drvOpen').classList.toggle('hidden',!has);$('drvLink').classList.toggle('hidden',!has);if(has)$('drvOpen').href=DRV.folderUrl;
+  showRaccolta();
 }
-(async()=>{try{const c=await idb.get('drive');if(c&&c.url){Object.assign(DRV,c);}}catch(e){}showDrive();if(driveOn())drivePing();})();
+drivePing();
 window.addEventListener('online',()=>{if(driveOn())drivePing().then(ok=>{if(ok)setDirState('ok');});});
 window.addEventListener('offline',()=>{if(driveOn()){DRV.ok=false;DRV.err='nessuna connessione a internet';showDrive();setDirState('down');}});
 setInterval(()=>{if(driveOn()&&DRV.ok===false&&!running)drivePing().then(ok=>{if(ok){setDirState('ok');}});},60000);   // se Drive torna, ricollega da solo
-$('drvCfg').onclick=()=>{$('drvForm').classList.toggle('hidden');$('drvUrl').value=DRV.url||'';$('drvTok').value=DRV.token||'';$('drvUrl').focus();};
-$('drvSave').onclick=async()=>{
-  const u=$('drvUrl').value.trim(),t=$('drvTok').value.trim(),m=$('tPanelMsg');
-  if(!/^https:\/\/script\.google\.com\/.+\/exec$/.test(u)){m.className='tmsg bad';m.textContent='L\'URL deve essere quello dello script e finire con /exec';return;}
-  if(!t){m.className='tmsg bad';m.textContent='Manca il codice.';return;}
-  DRV.url=u;DRV.token=t;DRV.folderUrl=null;m.className='tmsg';m.textContent='Provo il collegamento…';
-  const ok=await drivePing();await saveDriveCfg();
-  if(ok){m.className='tmsg ok';m.textContent='✅ Collegato alla cartella Drive. I ricordi andranno lì.';$('drvForm').classList.add('hidden');}
-  else{m.className='tmsg bad';m.textContent='⚠ Non riesco a collegarmi: '+(DRV.err||'')+'. Controlla URL, codice e internet.';}
+$('racBox').onchange=async()=>{
+  const v=$('racBox').checked,m=$('tPanelMsg');
+  try{const j=await driveCall('setConfig',{raccolta:v},12000,true);applyServerConfig(j);m.className='tmsg ok';m.textContent=v?'✅ Raccolta aperta: i PC possono salvare i ricordi su Drive.':'✅ Raccolta chiusa: da ora i ricordi vanno in Download.';}
+  catch(e){m.className='tmsg bad';m.textContent='Non riesco a cambiare la raccolta: '+e.message;showRaccolta();}
 };
-$('drvClear').onclick=async()=>{DRV.url=DRV.token='';DRV.folderUrl=DRV.folderName=null;DRV.ok=null;await saveDriveCfg();showDrive();$('drvForm').classList.add('hidden');$('tPanelMsg').className='tmsg';$('tPanelMsg').textContent='Drive scollegato su questo PC.';};
 $('drvLink').onclick=async()=>{
   const txt=`[InternetShortcut]\r\nURL=${DRV.folderUrl}\r\nIconIndex=0\r\n`,blob=new Blob([txt],{type:'application/octet-stream'}),name='Ricordi Open Day.url',m=$('tPanelMsg');
   try{
@@ -1734,7 +1724,7 @@ $('drvLink').onclick=async()=>{
 };
 
 async function saveFile(fname,blob,dir,opts={}){
-  if(!dir&&driveOn()){
+  if(!dir&&driveOn()&&DRV.raccolta!==false){
     const m=$('certMsg');if($('certModal').classList.contains('on'))m.textContent='Invio il ricordo alla cartella Drive…';
     try{
       await driveCall('upload',{name:fname,b64:await blobToB64(blob),merged:!!opts.merged},opts.merged?120000:DRV.ok===false?8000:25000);
@@ -1793,11 +1783,10 @@ async function applyEpoch(ep){
 }
 async function flushReg(){
   if(!driveOn())return;await loadLocalReg();const pend=localReg.filter(e=>!e.up);if(!pend.length)return;
-  try{await driveCall('register',{entries:pend.map(({up,...e})=>e)},8000);pend.forEach(e=>e.up=true);try{await idb.set('reg',localReg);}catch(e){}}
+  try{const j=await driveCall('register',{entries:pend.map(({up,...e})=>e)},8000);pend.forEach(e=>e.up=true);try{await idb.set('reg',localReg);}catch(e){}}
   catch(e){DRV.ok=false;DRV.err=e.message;showDrive();}
 }
 async function readSharedReg(){
-  if(driveOn()){try{const j=await driveCall('registry',{},DRV.ok===false?4000:8000);DRV.ok=true;await applyEpoch(j.epoch);return j.entries||[];}catch(e){DRV.ok=false;DRV.err=e.message;showDrive();setDirState('down');return[];}}
   if(!dirHandle)return[];
   try{return await withTimeout((async()=>{
     const rd=await regDir();if(!rd)return[];const out=[];let ep=null;
@@ -1812,17 +1801,22 @@ async function writeSharedReg(){
   try{await withTimeout((async()=>{const rd=await regDir();if(!rd)return;const fh=await rd.getFileHandle((await getPcId())+'.json',{create:true});const w=await fh.createWritable();await w.write(JSON.stringify(localReg));await w.close();})(),5000);}
   catch(e){setDirState('down');}
 }
-async function fullRegistry(){
-  const sh=await readSharedReg(),loc=await loadLocalReg(),m=new Map();
-  for(const e of [...sh,...loc])m.set(e.pc+'|'+e.t,e);
-  return[...m.values()];
+/* cerca il nome nel registro: su Drive (tutti i PC) e su questo PC */
+async function regLookup(name){
+  const nh=await nameHash(name);let srv=null;
+  if(driveOn()){try{srv=await driveCall('check',{nh},DRV.ok===false?4000:8000);DRV.ok=true;await applyEpoch(srv.epoch);showDrive();}catch(e){DRV.ok=false;DRV.err=e.message;showDrive();setDirState('down');}}
+  await loadLocalReg();
+  const loc=[...localReg,...(srv?[]:await readSharedReg())],m=new Map();
+  for(const e of [...(srv?srv.same:[]),...loc.filter(e=>e.nh===nh)])m.set(e.pc+'|'+e.t,e);
+  return{nh,same:[...m.values()].sort((a,b)=>a.t-b.t),
+    fulls:new Set([...(srv?srv.fulls:[]),...loc.map(e=>e.full)]),sigs:new Set([...(srv?srv.sigs:[]),...loc.map(e=>e.sig)])};
 }
 async function register(id){
   await loadLocalReg();
-  localReg.push({name:id.kid.toLowerCase(),show:id.show,k:id.serial,full:id.full,sig:id.sig,t:Date.now(),pc:await getPcId()});
+  localReg.push({nh:await nameHash(id.kid.toLowerCase()),k:id.serial,full:id.full,sig:id.sig,t:Date.now(),pc:await getPcId()});
   try{await idb.set('reg',localReg);}catch(e){}
   if(driveOn())await flushReg();   // i robot creati mentre Drive non rispondeva vengono inviati alla prima occasione
-  else await writeSharedReg();     // il file di questo PC contiene sempre l'elenco completo: si risincronizza da solo
+  else await writeSharedReg();     // cartella locale: il file di questo PC contiene sempre l'elenco completo
 }
 
 async function openCert(){
@@ -1870,7 +1864,7 @@ $('mDir').onclick=async()=>{
 };
 $('mDrive').onclick=async()=>{
   const m=$('mMsg');m.className='';m.textContent='Leggo la cartella Drive…';
-  try{const j=await driveCall('list',{},20000);mergeDir=null;mergeFromDrive=true;mergeList=j.files.filter(f=>isRicordo(f.name));m.textContent='';mergeInfo();}
+  try{const j=await driveCall('list',{},20000,true);mergeDir=null;mergeFromDrive=true;mergeList=j.files.filter(f=>isRicordo(f.name));m.textContent='';mergeInfo();}
   catch(e){m.className='bad';m.textContent='Non riesco a leggere la cartella Drive: '+e.message;}
 };
 $('mFiles').onchange=e=>{mergeDir=null;mergeFromDrive=false;mergeList=[...e.target.files].filter(f=>isRicordo(f.name)).sort((a,b)=>a.name.localeCompare(b.name));mergeInfo();e.target.value='';};
@@ -1880,7 +1874,7 @@ $('mGo').onclick=async()=>{
     const pages=[];let skip=0;
     for(const [i,f] of mergeList.entries()){
       let u8;
-      if(f.id){msg.textContent=`Scarico da Drive ${i+1} di ${mergeList.length}…`;u8=b64ToBytes((await driveCall('get',{id:f.id},30000)).b64);}
+      if(f.id){msg.textContent=`Scarico da Drive ${i+1} di ${mergeList.length}…`;u8=b64ToBytes((await driveCall('get',{id:f.id},30000,true)).b64);}
       else u8=new Uint8Array(await f.arrayBuffer());
       const pg=extractPages(u8);if(pg.length)pages.push(...pg);else skip++;
     }
@@ -1901,7 +1895,7 @@ $('dirBtn').onclick=pickDir;
 /* =========================================================
    AREA DOCENTE — nascosta e protetta da PIN
    ========================================================= */
-let pinFails=0,pinLockUntil=0,memPin=null,pinMode='create';
+let pinFails=0,pinLockUntil=0,memPin=null;
 async function pinHash(p){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('robotcoder|'+p));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');}
 async function getPinHash(){try{return(await idb.get('pinHash'))||memPin;}catch(e){return memPin;}}
 async function setPinHash(h){memPin=h;try{await idb.set('pinHash',h);}catch(e){}}
@@ -1909,31 +1903,45 @@ function tView(v){['tLock','tCreate','tPanel'].forEach(id=>$(id).classList.toggl
 async function openTeach(){
   if($('teachModal').classList.contains('on'))return;
   ['tPin','tNew1','tNew2'].forEach(id=>$(id).value='');['tLockMsg','tCreateMsg','tPanelMsg'].forEach(id=>{$(id).textContent='';$(id).className='tmsg';});
-  const h=await getPinHash();
-  if(!h){pinMode='create';$('tCreateTxt').innerHTML='<b>Primo avvio su questo PC:</b> crea il PIN docente (almeno 4 cifre). Dallo anche allo studente tutor.';tView('tCreate');setTimeout(()=>$('tNew1').focus(),50);}
-  else{tView('tLock');setTimeout(()=>$('tPin').focus(),50);}
+  tView('tLock');setTimeout(()=>$('tPin').focus(),50);
   $('teachModal').classList.add('on');
 }
-function closeTeach(){$('teachModal').classList.remove('on');$('mergeModal').classList.remove('on');tView('tLock');}
+function closeTeach(){ADMIN.code=null;showDrive();$('teachModal').classList.remove('on');$('mergeModal').classList.remove('on');tView('tLock');}
 async function tryPin(){
-  const m=$('tLockMsg');
+  const m=$('tLockMsg'),code=$('tPin').value.trim();$('tPin').value='';
   if(Date.now()<pinLockUntil){m.className='tmsg bad';m.textContent=`Troppi tentativi: riprova tra ${Math.ceil((pinLockUntil-Date.now())/1000)} s.`;return;}
-  const ok=(await pinHash($('tPin').value))===(await getPinHash());$('tPin').value='';
-  if(!ok){pinFails++;if(pinFails>=5){pinLockUntil=Date.now()+60000;pinFails=0;}m.className='tmsg bad';m.textContent='PIN sbagliato.';sfx.bonk();return;}
-  pinFails=0;await showPanel();
+  if(!code)return;
+  const bad=()=>{pinFails++;if(pinFails>=5){pinLockUntil=Date.now()+60000;pinFails=0;}m.className='tmsg bad';m.textContent='Codice sbagliato.';sfx.bonk();};
+  let online=false;
+  if(driveOn()){
+    m.className='tmsg';m.textContent='Verifico il codice…';
+    try{ADMIN.code=code;const j=await driveCall('ping',{},10000,true);online=true;
+      if(!j.admin){ADMIN.code=null;return bad();}
+      DRV.ok=true;DRV.folderUrl=j.folderUrl;DRV.folderName=j.folderName;applyServerConfig(j);
+      await setPinHash(await pinHash(code));   // impronta del codice: permette di entrare anche senza internet su questo PC
+    }catch(e){ADMIN.code=null;}
+  }
+  if(!online){                              // senza internet: confronto con l'impronta salvata dopo l'ultimo accesso riuscito
+    const h=await getPinHash();
+    if(!h){$('tCreateTxt').innerHTML='<b>Senza internet</b> non posso verificare il codice docente. Crea un <b>PIN</b> valido solo su questo PC (da 4 a 12 cifre).';tView('tCreate');setTimeout(()=>$('tNew1').focus(),50);return;}
+    if((await pinHash(code))!==h)return bad();
+  }
+  pinFails=0;m.textContent='';await showPanel();
+  if(!online){$('tPanelMsg').className='tmsg';$('tPanelMsg').textContent='Senza internet: funzioni Drive non disponibili.';}
 }
 async function savePin(){
   const a=$('tNew1').value,b=$('tNew2').value,m=$('tCreateMsg');m.className='tmsg bad';
   if(!/^\d{4,12}$/.test(a)){m.textContent='Il PIN deve avere da 4 a 12 cifre.';return;}
   if(a!==b){m.textContent='I due PIN non coincidono.';return;}
   await setPinHash(await pinHash(a));
-  await showPanel();$('tPanelMsg').className='tmsg ok';$('tPanelMsg').textContent='✅ PIN salvato su questo PC.';
+  await showPanel();$('tPanelMsg').className='tmsg ok';$('tPanelMsg').textContent='✅ PIN locale salvato su questo PC (vale solo senza internet).';
 }
 async function showPanel(){
-  tView('tPanel');showDir();checkDir();showDrive();if(driveOn())drivePing();
+  tView('tPanel');showDir();checkDir();showDrive();
   $('tRegInfo').textContent='…';
-  try{const all=await fullRegistry(),me=await getPcId();$('tRegInfo').textContent=`${all.filter(e=>e.pc===me).length} robot su questo PC (${me}) · ${all.length} in totale`;}
-  catch(e){$('tRegInfo').textContent='non disponibile';}
+  await loadLocalReg();const me=await getPcId(),loc=`${localReg.length} robot creati su questo PC (${me})`;
+  if(driveOn()&&ADMIN.code){try{const j=await driveCall('stats',{},10000,true);applyServerConfig(j);$('tRegInfo').textContent=`${j.count} su Drive (tutti i PC) · ${loc}`;return;}catch(e){}}
+  $('tRegInfo').textContent=loc;
 }
 function confirmBtn(btn,label,fn){
   btn.onclick=async()=>{
@@ -1946,7 +1954,7 @@ function confirmBtn(btn,label,fn){
 }
 confirmBtn($('tResetLocal'),'Solo questo PC',async()=>{localReg=[];try{await idb.set('reg',[]);}catch(e){}await writeSharedReg();return '✅ Registro di questo PC azzerato.';});
 confirmBtn($('tResetAll'),'Tutti i PC',async()=>{
-  if(driveOn()){const j=await driveCall('resetRegistry',{},15000);localReg=[];try{await idb.set('reg',[]);await idb.set('regEpoch',j.epoch);}catch(e){}return '✅ Registro azzerato su Drive per tutti i PC.';}
+  if(driveOn()&&ADMIN.code){const j=await driveCall('resetRegistry',{},15000,true);localReg=[];try{await idb.set('reg',[]);await idb.set('regEpoch',j.epoch);}catch(e){}return '✅ Registro azzerato su Drive per tutti i PC.';}
   if(!dirHandle)throw new Error('Prima collega la cartella Drive (o una cartella locale): il registro comune sta lì.');
   if(!(await ensurePerm(dirHandle)))throw new Error('Permesso sulla cartella negato.');
   try{await dirHandle.removeEntry('_registro',{recursive:true});}catch(e){if(e.name!=='NotFoundError')throw e;}
@@ -1958,7 +1966,6 @@ confirmBtn($('tResetAll'),'Tutti i PC',async()=>{
 });
 $('tEnter').onclick=tryPin;$('tPin').onkeydown=e=>{if(e.key==='Enter')tryPin();};
 $('tCreateBtn').onclick=savePin;$('tNew2').onkeydown=e=>{if(e.key==='Enter')savePin();};
-$('tChangePin').onclick=()=>{$('tCreateTxt').textContent='Scegli il nuovo PIN docente per questo PC.';$('tNew1').value=$('tNew2').value='';$('tCreateMsg').textContent='';tView('tCreate');$('tNew1').focus();};
 $('tClose').onclick=closeTeach;
 $('teachModal').onclick=e=>{if(e.target.id==='teachModal')closeTeach();};
 document.addEventListener('keydown',e=>{
