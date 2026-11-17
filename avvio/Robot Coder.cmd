@@ -6,7 +6,7 @@ rem
 rem  Copiare questo file sul desktop dei PC del laboratorio.
 rem  Doppio clic: apre Robot Coder in una finestra senza barre.
 rem ============================================================
-set "URL=https://dati-grezzi.github.io/Robotencoder/"
+set "URL=https://datigrezzi.it/robocoder/"
 
 set "CH1=%ProgramFiles%\Google\Chrome\Application\chrome.exe"
 set "CH2=%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe"

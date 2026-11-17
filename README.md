@@ -2,7 +2,7 @@
 
 Laboratorio di coding per l'**Open Day** dell'Istituto "Enrico Mestica" di Civitanova Marche.
 
-**App:** https://dati-grezzi.github.io/Robotencoder/
+**App:** https://datigrezzi.it/robocoder/
 
 Il bambino scrive il suo nome. L'app lo traduce in binario ed esadecimale e da quei numeri ricava un robot unico, che poi il bambino programma scrivendo codice vero: variabili, cicli, condizioni, output.
 - La **Console** racconta riga per riga che cosa fa il programma.

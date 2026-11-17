@@ -1,7 +1,7 @@
 /**
  * Robot Coder — ponte verso Google Drive per i ricordi dell'Open Day
  * Istituto "Enrico Mestica" · Civitanova Marche
- * Repository: https://github.com/dati-grezzi/Robotencoder
+ * Repository: https://github.com/dati-grezzi/robocoder
  *
  * L'app vive su GitHub Pages; questo script (account della scuola dedicato)
  * riceve i PDF e li salva nella cartella Drive "Ricordi Open Day", dove tiene
@@ -49,7 +49,7 @@ function getFolder_(create) {
 
 /* ---------- web app ---------- */
 function doGet() {
-  return out_({ ok: true, app: 'RobotCoder', msg: 'Ponte attivo. L\'app è su https://dati-grezzi.github.io/Robotencoder/' });
+  return out_({ ok: true, app: 'RobotCoder', msg: 'Ponte attivo. L\'app è su https://datigrezzi.it/robocoder/' });
 }
 
 /** chiamata dall'app (GitHub Pages): serve il CODICE */

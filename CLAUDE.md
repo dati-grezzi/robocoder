@@ -1,6 +1,6 @@
 # Robot Coder — note per Claude
 
-- L'app è `index.html`: un solo file con HTML, CSS e JS inline, senza build e senza librerie. È pubblicata con GitHub Pages dal branch `main`, nella root.
+- L'app è `index.html`: un solo file con HTML, CSS e JS inline, senza build e senza librerie. È pubblicata con GitHub Pages dal branch `main`, nella root, all'indirizzo https://datigrezzi.it/robocoder/ (dominio dell'organizzazione dati-grezzi).
 - Il backend è `apps-script/Codice.gs`. Al lo copia a mano in script.google.com, sull'account dedicato della scuola. Le azioni di `doPost` sono: ping, upload, registry, register, resetRegistry, list, get. Ogni richiesta contiene un `token`.
 - Il repository è pubblico. Non mettere mai nel repository il CODICE dello script, PIN, nomi di bambini o indirizzi email della scuola. L'URL /exec non è segreto e può stare in `DRIVE_URL_DEFAULT`.
 - Lingua: italiano, sia nell'interfaccia sia nei documenti.

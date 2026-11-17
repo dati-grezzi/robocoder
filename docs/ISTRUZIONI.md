@@ -3,7 +3,7 @@
 **Laboratorio di coding · Istituto "Enrico Mestica" · Civitanova Marche**
 Referente: prof. Al (matematica). Questo documento serve a chiunque debba gestire il laboratorio al suo posto.
 
-> **Dove si trova:** Robot Coder è una pagina web pubblicata su GitHub: **https://dati-grezzi.github.io/Robotencoder/**. I ricordi PDF finiscono nella cartella Drive **Ricordi Open Day** dell'account dedicato della scuola, tramite un piccolo script Google (§ 4 A). Il codice sorgente è in https://github.com/dati-grezzi/Robotencoder.
+> **Dove si trova:** Robot Coder è una pagina web pubblicata su GitHub: **https://datigrezzi.it/robocoder/**. I ricordi PDF finiscono nella cartella Drive **Ricordi Open Day** dell'account dedicato della scuola, tramite un piccolo script Google (§ 4 A). Il codice sorgente è in https://github.com/dati-grezzi/robocoder.
 >
 > **In breve:** ogni bambino scrive il suo nome, l'app lo trasforma in binario ed esadecimale e ne ricava un robot unico. Il bambino lo programma scrivendo codice e vede gli impulsi elettrici che il codice genera. Alla fine scarica un ricordo PDF A4. A fine giornata il docente unisce tutti i PDF in un unico file e lo stampa.
 
@@ -13,7 +13,7 @@ Referente: prof. Al (matematica). Questo documento serve a chiunque debba gestir
 
 | Cosa | Dettaglio |
 |---|---|
-| Indirizzo dell'app | **https://dati-grezzi.github.io/Robotencoder/** |
+| Indirizzo dell'app | **https://datigrezzi.it/robocoder/** |
 | File di avvio | `avvio/Robot Coder.cmd` del repository: copiato sul desktop, apre l'app in una finestra senza barre (§ 4 B) |
 | Browser | **Google Chrome** o **Microsoft Edge** |
 | Internet | Necessario per aprire l'app e salvare su Drive. Se cade durante il laboratorio, l'app già aperta continua a funzionare e i ricordi vanno nella cartella Download del PC |
@@ -111,7 +111,7 @@ Per un nuovo evento (es. Open Day 2027/28) si aggiunge una riga all'elenco `EVEN
 
 1. **Icona sul desktop** — uno dei due modi:
    - copiare sul desktop il file **`Robot Coder.cmd`** (cartella `avvio` del repository, da chiavetta). Doppio clic → l'app si apre in una **finestra senza barre** (Chrome, oppure Edge). Per un attimo può comparire una finestrella nera: è normale. La prima volta Windows potrebbe mostrare *"Windows ha protetto il PC"* → *Ulteriori informazioni → Esegui comunque*;
-   - oppure aprire Chrome, scrivere **dati-grezzi.github.io/Robotencoder** → ⋮ → **Trasmetti, salva e condividi → Crea scorciatoia…** → spuntare **Apri come finestra**.
+   - oppure aprire Chrome, scrivere **datigrezzi.it/robocoder** → ⋮ → **Trasmetti, salva e condividi → Crea scorciatoia…** → spuntare **Apri come finestra**.
 2. Aprire l'app → **area docente** (**Ctrl + Alt + D**) → **creare il PIN** (lo stesso su tutti i PC).
 3. **☁ Cartella Drive → Configura** → inserire il **CODICE** (e l'URL `/exec`, se il campo è vuoto) → **Salva e prova**: deve comparire *«Ricordi Open Day» ✓ collegata*.
 4. **Sul PC del docente:** **🖥 Collegamento sul desktop** → scegliere il Desktop → salvare. Doppio clic → si apre la cartella Drive (accedere con l'account dedicato **solo su quel PC**).
@@ -195,7 +195,7 @@ L'unione ignora automaticamente i file che non sono ricordi e i PDF già uniti, 
 | Cosa succede | Cosa fare |
 |---|---|
 | Messaggio arancione **"La cartella Drive non risponde, ma il ricordo non è perso"** | Il PDF è nella cartella **Download** di quel PC. In alto compare un avviso giallo con il numero di file finiti lì. Il lavoro continua normalmente. Quando internet torna, l'app si ricollega da sola (entro un minuto). A fine giornata caricare quei PDF nella cartella Drive, oppure selezionarli a mano in "Unisci ricordi". |
-| L'icona **non apre l'app** | Controllare internet. Provare ad aprire **dati-grezzi.github.io/Robotencoder** in Chrome. Se GitHub non risponde: usare il file di riserva (§ 4 E). |
+| L'icona **non apre l'app** | Controllare internet. Provare ad aprire **datigrezzi.it/robocoder** in Chrome. Se GitHub non risponde: usare il file di riserva (§ 4 E). |
 | Area docente: Drive **⚠ non raggiungibile (codice errato)** | Il CODICE inserito non è quello dello script: **Configura** e reinserirlo. |
 | Area docente: Drive **⚠ non raggiungibile (risposta non valida)** | URL dello script sbagliato o deployment rimosso: verificare l'URL `/exec` in script.google.com → *Gestisci deployment*. |
 | Area docente: Drive **⚠ non raggiungibile** (altro) | Controllare internet sul PC. Se non si risolve si va avanti: i PDF vanno in Download. |
@@ -323,7 +323,7 @@ Nei **poligoni l'angolo non è scritto**: il bambino deve scoprirlo. Ogni sfida 
 
 ## 12. Versioni, aggiornamenti e backup
 
-- Tutto è nel repository **https://github.com/dati-grezzi/Robotencoder**:
+- Tutto è nel repository **https://github.com/dati-grezzi/robocoder**:
   - `index.html` — l'app (pubblicata automaticamente su GitHub Pages);
   - `apps-script/Codice.gs` — lo script Drive (da copiare in script.google.com, § 4 A);
   - `avvio/` — i file di avvio da copiare sul desktop dei PC;
