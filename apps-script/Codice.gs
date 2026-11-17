@@ -178,8 +178,8 @@ function upload_(folder, name, b64, merged) {
   const bytes = Utilities.base64Decode(String(b64 || ''));
   if (bytes.length > (merged ? MAX_MERGED : MAX_BYTES)) return { ok: false, err: 'file troppo grande' };
   if (!(bytes[0] === 37 && bytes[1] === 80 && bytes[2] === 68 && bytes[3] === 70)) return { ok: false, err: 'non è un PDF' };
-  const same = folder.getFilesByName(name);
-  if (same.hasNext()) { const f = same.next(); return { ok: true, id: f.getId(), dup: true }; }   // invio ripetuto: nessun doppione
+  const same = folder.getFilesByName(name);                     // stesso nome = stesso robot nello stesso giorno:
+  while (same.hasNext()) same.next().setTrashed(true);            // il nuovo ricordo sostituisce il vecchio (che va nel cestino)
   const f = folder.createFile(Utilities.newBlob(bytes, MimeType.PDF, name));
   return { ok: true, id: f.getId() };
 }

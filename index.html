@@ -1840,7 +1840,7 @@ $('certSave').onclick=async()=>{
     const blob=await new Promise(r=>certCv.toBlob(r,'image/jpeg',.93));
     const jpg=new Uint8Array(await blob.arrayBuffer());
     const pdf=pagesToPdf([{jpg,w:certCv.width,h:certCv.height}],`Robot Coder - ${ID.kid}`);
-    const fname=`${stamp()}_${ID.kid.replace(/ /g,'_')}_${ID.sigla}.pdf`;
+    const fname=`${stamp().slice(0,10)}_${ID.kid.replace(/ /g,'_')}_${ID.sigla}.pdf`;   // stesso robot, stesso giorno = stesso file: un secondo ricordo sostituisce il primo
     const r=await saveFile(fname,pdf);msg.innerHTML=r.html;msg.className=r.warn?'warn':'ok';r.warn?sfx.bonk():sfx.ok();
   }catch(e){console.error(e);msg.className='bad';msg.textContent=e.message||'Errore nella creazione del PDF.';}
 };

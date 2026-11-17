@@ -33,9 +33,9 @@ Referente: prof. Al (matematica). Questo documento serve a chiunque debba gestir
 Google Drive dell'account dedicato
 └── Il mio Drive
     └── Ricordi Open Day                                ← collegamento "Ricordi Open Day" sul desktop
-        ├── 2026-11-14_10-52-32_Giulia_G5B.pdf           ← un ricordo per bambino
-        ├── 2026-11-14_10-52-49_Anna_Maria_A88.pdf          (nome = data_ora_nome_sigla)
-        ├── 2026-11-14_10-53-05_Luca_L85.pdf
+        ├── 2026-11-14_Giulia_G5B.pdf           ← un ricordo per bambino
+        ├── 2026-11-14_Anna_Maria_A88.pdf          (nome = data_nome_sigla)
+        ├── 2026-11-14_Luca_L85.pdf
         ├── …
         ├── Ricordi_OpenDay_2026-11-14_17-30-00_48pagine.pdf   ← PDF unico da stampare
         └── _registro.json                               ← NON TOCCARE: elenco dei robot creati
@@ -43,7 +43,8 @@ Google Drive dell'account dedicato
 
 - I PDF arrivano su Drive **appena il bambino preme "Scarica PDF A4"**, da tutti i PC, senza che sui PC sia aperto alcun account Google: li salva lo script, che lavora come account dedicato.
 - **Su GitHub non finisce nessun dato dei bambini**: lì c'è solo il programma.
-- I file `.pdf` sono in **ordine di creazione** grazie a data e ora nel nome.
+- I file `.pdf` sono in ordine di data e poi di nome.
+- **Ricordo generato due volte** (anche dopo "Sono io"): il nuovo **sostituisce** il vecchio, che finisce nel cestino di Drive. Nel PDF unito ogni bambino compare una volta sola. Due omonimi restano due file distinti, perché hanno robot diversi.
 - `_registro.json` serve a garantire che **non ci siano due robot uguali**, anche tra omonimi e su PC diversi.
 - **Paracadute:** se internet o Drive non rispondono, il PDF finisce nella cartella **Download** di quel PC (vedi § 8) e il robot viene comunque registrato appena Drive torna raggiungibile.
 

@@ -22,7 +22,9 @@ SU OGNI PC
 DURANTE LA GIORNATA
   - Funziona tutto: robot, codice, Console, impulsi, voce, ricordo PDF.
   - I ricordi PDF finiscono nella cartella DOWNLOAD di ogni PC.
-    Il nome inizia con data e ora, es. 2026-11-22_10-52-32_Giulia_G5B.pdf
+    Il nome e' data_nome_sigla, es. 2026-11-22_Giulia_G5B.pdf
+  - Se un bambino genera il ricordo due volte, in Download trovi una
+    copia con (1) nel nome: cancellala prima di unire.
   - ATTENZIONE: senza internet ogni PC conosce solo i propri robot.
     Se due bambini con lo stesso nome usano due PC diversi, possono
     ricevere lo stesso robot. Sullo stesso PC invece resta tutto unico.
