@@ -198,6 +198,7 @@ button:disabled{opacity:.35;cursor:default}
 .trow>div{flex:1;min-width:220px}.trow small{color:var(--mute)}
 .trow .sec{font-size:15px;padding:8px 12px}
 .txt{display:block;width:100%;margin-top:3px;font:14px 'JetBrains Mono',monospace;padding:8px 10px;border-radius:9px;border:2px solid var(--line);background:#0b0e20;color:var(--ink);outline:none}.txt:focus{border-color:var(--acc)}
+.badgeBox{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:10px;font-size:15px}.badgeBox .txt{font:14px Fredoka,sans-serif}
 .sec.danger{border-color:#7a2236}.sec.danger:hover{border-color:var(--err)}
 .tmsg{min-height:22px;font-size:15px;color:var(--mute)}.tmsg.ok{color:var(--ok)}.tmsg.bad{color:var(--err)}
 #mMsg.ok,#certMsg.ok{color:var(--ok)}#mMsg.warn,#certMsg.warn{color:var(--acc)}
@@ -323,6 +324,11 @@ button:disabled{opacity:.35;cursor:default}
       <label><input type="checkbox" id="certDraw" checked> Metti anche il mio disegno</label>
       <button class="big" id="certSave">⬇ Scarica PDF A4</button>
       <div id="certMsg"></div>
+      <div class="badgeBox">
+        <b>🏷 Adesivi badge</b>
+        <select id="badgeShape" class="txt"><option value="tondo">Tondi Ø 64 mm · 12 per foglio</option><option value="rett">Rettangolari 85×55 mm · 10 per foglio</option></select>
+        <button class="sec" id="badgeBtn">⬇ Foglio di adesivi A4</button>
+      </div>
       <button class="sec" id="certClose" style="margin-top:auto">Chiudi</button>
     </div>
   </div>
@@ -1466,8 +1472,8 @@ const m1Ctx=fitCanvas($('mini1'),190,190,190),m2Ctx=fitCanvas($('mini2'),170,170
 /* ---------- EVENTI: ogni evento ha il suo ricordo ----------
    Per aggiungerne uno: copiare un blocco e cambiare i testi. */
 const EVENTI={
-  openday2627:{nome:'Open Day 2026/27',badge:'🎉 Open Day 2026/27',intestazione:'Open Day 2026/27',titolo:'PATENTE DI ROBOT CODER',a:'rilasciata a',piede:'Open Day 2026/27 · Laboratorio di coding Robot Coder'},
-  laboratorio:{nome:'Laboratorio di coding',badge:'💻 Laboratorio di coding',intestazione:'Laboratorio di coding',titolo:'ATTESTATO DI ROBOT CODER',a:'conseguito da',piede:'Laboratorio di coding · Robot Coder'}
+  openday2627:{adesivo:'OPEN DAY MESTICA',nome:'Open Day 2026/27',badge:'🎉 Open Day 2026/27',intestazione:'Open Day 2026/27',titolo:'PATENTE DI ROBOT CODER',a:'rilasciata a',piede:'Open Day 2026/27 · Laboratorio di coding Robot Coder'},
+  laboratorio:{adesivo:'CODING LAB MESTICA',nome:'Laboratorio di coding',badge:'💻 Laboratorio di coding',intestazione:'Laboratorio di coding',titolo:'ATTESTATO DI ROBOT CODER',a:'conseguito da',piede:'Laboratorio di coding · Robot Coder'}
 };
 const EVENTO_PREDEFINITO='openday2627';
 let evId=EVENTO_PREDEFINITO;
@@ -1819,6 +1825,74 @@ async function register(id){
   else await writeSharedReg();     // cartella locale: il file di questo PC contiene sempre l'elenco completo
 }
 
+/* ---------- ADESIVI BADGE: robot + evento + nome in binario ---------- */
+const MM=200/25.4;   // pixel per mm a 200 dpi
+function arcText(c,txt,cx,cy,r,size){        // testo lungo l'arco superiore di un cerchio
+  c.save();c.font=`700 ${size}px Fredoka,sans-serif`;c.textAlign='center';c.textBaseline='middle';
+  const chars=[...txt],ws=chars.map(ch=>c.measureText(ch).width+size*.08),tot=ws.reduce((a,b)=>a+b,0);
+  let ang=-Math.PI/2-tot/r/2;
+  for(let i=0;i<chars.length;i++){const a=ang+ws[i]/r/2;c.save();c.translate(cx+r*Math.cos(a),cy+r*Math.sin(a));c.rotate(a+Math.PI/2);c.fillText(chars[i],0,0);c.restore();ang+=ws[i]/r;}
+  c.restore();
+}
+function binLines(perLine){const g=ID.bytes.map(b=>b.toString(2).padStart(8,'0')),out=[];for(let i=0;i<g.length;i+=perLine)out.push(g.slice(i,i+perLine).join(' '));return out;}
+function drawBadge(c,x,y,w,h,shape){
+  const tr=ID.traits,col=l=>`hsl(${tr.hue},70%,${l}%)`,top=EV().adesivo||'MESTICA';
+  c.save();c.translate(x,y);
+  if(shape==='tondo'){
+    const R=w/2,cx=R,cy=R;
+    c.fillStyle='#fff';c.beginPath();c.arc(cx,cy,R-2,0,Math.PI*2);c.fill();
+    c.strokeStyle=col(50);c.lineWidth=R*.07;c.beginPath();c.arc(cx,cy,R-R*.05,0,Math.PI*2);c.stroke();
+    c.strokeStyle=col(85);c.lineWidth=2;c.beginPath();c.arc(cx,cy,R*.88,0,Math.PI*2);c.stroke();
+    c.fillStyle='#1b1f45';arcText(c,top,cx,cy,R*.76,R*.15);
+    drawRobot(c,cx,cy-R*.06,R*.72,tr,{t:.3});
+    c.textAlign='center';c.textBaseline='alphabetic';c.fillStyle=col(40);fitText(c,ID.full,R*1.1,R*.12,'700','Fredoka,sans-serif');c.fillText(ID.full,cx,cy+R*.42);
+    const L=binLines(ID.bytes.length<=6?3:4),fs=Math.min(R*.085,(R*1.25)/(L[0].length*.62)),lh=fs*1.15;
+    c.font=`600 ${fs}px "JetBrains Mono",monospace`;c.fillStyle='#1b8fb5';
+    const y0=cy+R*.55;L.slice(0,3).forEach((l,i)=>c.fillText(l,cx,y0+i*lh));
+    if(L.length>3){c.fillStyle='#8a8fa3';c.fillText('…',cx,y0+3*lh);}
+  }else{
+    const r=h*.09;
+    c.fillStyle='#fff';c.beginPath();c.roundRect(2,2,w-4,h-4,r);c.fill();
+    c.strokeStyle=col(50);c.lineWidth=h*.035;c.beginPath();c.roundRect(h*.02,h*.02,w-h*.04,h-h*.04,r);c.stroke();
+    c.fillStyle=col(50);c.beginPath();c.roundRect(h*.02,h*.02,w-h*.04,h*.2,[r,r,0,0]);c.fill();
+    c.fillStyle='#fff';c.textAlign='center';c.textBaseline='middle';fitText(c,top,w*.9,h*.12,'700','Fredoka,sans-serif');
+    if('letterSpacing' in c)c.letterSpacing=(h*.012)+'px';c.fillText(top,w/2,h*.12);if('letterSpacing' in c)c.letterSpacing='0px';
+    drawRobot(c,w*.22,h*.6,h*.6,tr,{t:.3});
+    c.textAlign='left';c.textBaseline='alphabetic';c.fillStyle='#1b1f45';fitText(c,ID.full,w*.54,h*.13,'700','Fredoka,sans-serif');c.fillText(ID.full,w*.42,h*.38);
+    const L=binLines(2),fs=Math.min(h*.075,(w*.54)/(L[0].length*.62)),lh=fs*1.2;
+    c.font=`600 ${fs}px "JetBrains Mono",monospace`;c.fillStyle='#1b8fb5';
+    const n=Math.min(L.length,5),y0=h*.5;L.slice(0,n).forEach((l,i)=>c.fillText(l,w*.42,y0+i*lh));
+    c.font=`600 ${fs*.9}px "JetBrains Mono",monospace`;c.fillStyle=col(40);
+    fitText(c,ID.bytes.map(hex2).join(' '),w*.54,fs*.9,'600','"JetBrains Mono",monospace');c.fillText(ID.bytes.map(hex2).join(' '),w*.42,Math.min(h*.9,y0+n*lh+fs*.3));
+  }
+  c.restore();
+}
+const badgeCv=document.createElement('canvas');badgeCv.width=1654;badgeCv.height=2339;
+function renderBadgeSheet(shape){
+  const c=badgeCv.getContext('2d');c.setTransform(1,0,0,1,0,0);c.fillStyle='#fff';c.fillRect(0,0,1654,2339);
+  const [bw,bh,cols,rows]=shape==='tondo'?[64*MM,64*MM,3,4]:[85*MM,55*MM,2,5];
+  const gx=(1654-cols*bw)/(cols+1),gy=(2339-rows*bh)/(rows+1);
+  for(let r=0;r<rows;r++)for(let k=0;k<cols;k++){
+    const x=gx+k*(bw+gx),y=gy+r*(bh+gy);
+    c.strokeStyle='#d5d8e6';c.lineWidth=1;c.setLineDash([8,8]);c.beginPath();      // linea di taglio
+    if(shape==='tondo')c.arc(x+bw/2,y+bh/2,bw/2+6,0,Math.PI*2);else c.roundRect(x-6,y-6,bw+12,bh+12,bh*.1);
+    c.stroke();c.setLineDash([]);
+    drawBadge(c,x,y,bw,bh,shape);
+  }
+}
+$('badgeBtn').onclick=async()=>{
+  const msg=$('certMsg'),shape=$('badgeShape').value;msg.className='';msg.textContent='Preparo gli adesivi…';
+  try{
+    await document.fonts.ready;renderBadgeSheet(shape);
+    $('certPrev').src=badgeCv.toDataURL('image/jpeg',.85);
+    const blob=await new Promise(r=>badgeCv.toBlob(r,'image/jpeg',.93));
+    const pdf=pagesToPdf([{jpg:new Uint8Array(await blob.arrayBuffer()),w:1654,h:2339}],`Badge ${ID.kid}`);
+    const fname=`Badge_${ID.kid.replace(/ /g,'_')}_${ID.sigla}_${shape}.pdf`;
+    await downloadFile(fname,pdf);
+    msg.className='ok';msg.innerHTML=`✅ Adesivi scaricati in <b>Download</b>:<br><small>${fname}</small><br>Stampa su carta adesiva A4 al <b>100%</b> (non "adatta alla pagina").`;sfx.ok();
+  }catch(e){console.error(e);msg.className='bad';msg.textContent='Errore nella creazione degli adesivi.';}
+};
+
 async function openCert(){
   if(!ID)return;
   $('certDraw').checked=trailInk;$('certDraw').disabled=!trailInk;
@@ -1832,6 +1906,7 @@ async function openCert(){
 $('certBtn').onclick=openCert;$('certBtn2').onclick=openCert;
 $('certClose').onclick=()=>$('certModal').classList.remove('on');
 $('certModal').onclick=e=>{if(e.target.id==='certModal')$('certModal').classList.remove('on');};
+$('badgeShape').onchange=()=>{renderBadgeSheet($('badgeShape').value);$('certPrev').src=badgeCv.toDataURL('image/jpeg',.85);};
 $('certDraw').onchange=()=>{renderCert($('certDraw').checked);$('certPrev').src=certCv.toDataURL('image/jpeg',.85);};
 $('certSave').onclick=async()=>{
   const msg=$('certMsg');msg.className='';msg.textContent='Preparo il PDF…';
@@ -1854,7 +1929,7 @@ function mergeInfo(){
 $('mergeBtn').onclick=()=>{mergeList=[];mergeDir=null;mergeFromDrive=false;showDrive();$('mMsg').textContent='';$('mMsg').className='';mergeInfo();$('mDir').classList.toggle('hidden',!FS_OK);$('mergeModal').classList.add('on');};
 $('mClose').onclick=()=>$('mergeModal').classList.remove('on');
 $('mergeModal').onclick=e=>{if(e.target.id==='mergeModal')$('mergeModal').classList.remove('on');};
-const isRicordo=n=>/\.pdf$/i.test(n)&&!/^Ricordi_OpenDay/i.test(n);
+const isRicordo=n=>/\.pdf$/i.test(n)&&!/^(Ricordi_OpenDay|Badge_)/i.test(n);
 $('mDir').onclick=async()=>{
   try{
     const h=await window.showDirectoryPicker({id:'ricordi',mode:'readwrite'});mergeDir=h;mergeList=[];

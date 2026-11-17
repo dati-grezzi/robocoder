@@ -185,6 +185,16 @@ Su **ogni PC**:
 
 ---
 
+### Adesivi badge (per i tutor o per i bambini)
+
+Nella finestra **🖨 Il mio ricordo** c'è anche **🏷 Adesivi badge**: un foglio A4 di adesivi con il robot, la scritta **OPEN DAY MESTICA** in alto (o **CODING LAB MESTICA** per l'evento Laboratorio) e il nome **in binario** in basso, con l'esadecimale in piccolo.
+- Formati: **tondi Ø 64 mm** (12 per foglio) oppure **rettangolari 85×55 mm** (10 per foglio, misura da porta-badge).
+- Il PDF va in **Download** (non su Drive) e non entra in "Unisci ricordi".
+- Stampare su carta adesiva A4 **al 100 %** (non "Adatta alla pagina"), poi ritagliare lungo le linee tratteggiate.
+- Nei badge tondi un nome lungo mostra solo le prime righe in binario, seguite da "…".
+
+---
+
 ## 7. Fine giornata — unire e stampare
 
 Dal PC del docente (o da qualsiasi PC con Chrome/Edge):
