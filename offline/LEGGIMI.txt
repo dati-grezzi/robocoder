@@ -1,0 +1,44 @@
+ROBOT CODER - VERSIONE OFFLINE (paracadute senza internet)
+=========================================================
+
+Da usare SOLO se internet non funziona e datigrezzi.it/robocoder non si apre.
+
+PREPARAZIONE (una volta, sulla chiavetta)
+  Cartella "RobotCoder_offline" con dentro:
+    - RobotCoder.html                    (l'app; e' index.html del repository)
+    - Avvia Robot Coder OFFLINE.cmd      (avvio con doppio clic)
+    - LEGGIMI.txt                        (questo file)
+
+SU OGNI PC
+  1. Copiare la cartella "RobotCoder_offline" sul Desktop.
+     (Si puo' anche avviare direttamente dalla chiavetta, ma poi la
+      chiavetta deve restare inserita.)
+  2. Doppio clic su "Avvia Robot Coder OFFLINE.cmd".
+     - Se Windows mostra "Windows ha protetto il PC":
+       Ulteriori informazioni -> Esegui comunque.
+     - In alternativa: doppio clic su RobotCoder.html (si apre nel browser).
+  Non serve configurare niente: evento Open Day 2026/27 gia' impostato.
+
+DURANTE LA GIORNATA
+  - Funziona tutto: robot, codice, Console, impulsi, voce, ricordo PDF.
+  - I ricordi PDF finiscono nella cartella DOWNLOAD di ogni PC.
+    Il nome inizia con data e ora, es. 2026-11-22_10-52-32_Giulia_G5B.pdf
+  - ATTENZIONE: senza internet ogni PC conosce solo i propri robot.
+    Se due bambini con lo stesso nome usano due PC diversi, possono
+    ricevere lo stesso robot. Sullo stesso PC invece resta tutto unico.
+  - I caratteri possono sembrare un po' diversi: e' normale offline.
+
+A FINE GIORNATA
+  1. Su ogni PC: aprire Download, selezionare i PDF dei ricordi
+     (iniziano con la data di oggi) e copiarli sulla chiavetta,
+     ad esempio nella cartella "Ricordi".
+  2. Sul PC del docente: aprire Robot Coder, area docente
+     (Ctrl + Alt + D, poi PIN), "Unisci ricordi",
+     "Scegli file PDF" (o "Scegli cartella") -> cartella Ricordi
+     della chiavetta -> "Crea PDF unico" -> stampare.
+     (La prima volta l'area docente chiede di creare un PIN.)
+  3. Quando internet torna, si possono caricare i PDF nella cartella
+     Drive "Ricordi Open Day" trascinandoli in drive.google.com.
+
+Istruzioni complete: docs/ISTRUZIONI.md nel repository
+https://github.com/dati-grezzi/robocoder

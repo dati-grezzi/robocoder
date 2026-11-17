@@ -128,7 +128,22 @@ Per un nuovo evento (es. Open Day 2027/28) si aggiunge una riga all'elenco `EVEN
 - cancellare dalla cartella Drive i PDF di prova (non `_registro.json`);
 - area docente → 🧹 Azzera il registro → **Tutti i PC** (due clic). Gli altri PC si allineano da soli.
 
-**E. Riserva senza internet:** l'app si apre solo con internet. Per lavorare offline, copiare `index.html` del repository su una chiavetta (rinominarlo `RobotCoder.html`) e aprirlo con doppio clic; area docente → 📁 **Scegli cartella** sulla chiavetta.
+**E. Paracadute senza internet (chiavetta)**
+
+Da preparare prima e tenere a portata di mano, anche se non servirà. Sulla chiavetta va la cartella **`RobotCoder_offline`** con:
+- `RobotCoder.html` (è `index.html` del repository, rinominato);
+- `Avvia Robot Coder OFFLINE.cmd` (cartella `offline/` del repository);
+- `LEGGIMI.txt` (le istruzioni brevi, stessa cartella).
+
+Se internet non funziona:
+1. su ogni PC copiare la cartella `RobotCoder_offline` sul **Desktop** (oppure avviare direttamente dalla chiavetta, ma poi va lasciata inserita);
+2. doppio clic su **Avvia Robot Coder OFFLINE.cmd**: l'app si apre in una finestra senza barre. Non serve configurare niente, l'evento Open Day 2026/27 è già impostato;
+3. funziona tutto (robot, codice, Console, impulsi, voce, ricordo PDF); **i ricordi vanno nella cartella Download** di ogni PC;
+4. a fine giornata: da ogni PC copiare i PDF dei ricordi dalla cartella Download alla chiavetta; poi sul PC del docente **Unisci ricordi → Scegli file PDF** (o **Scegli cartella**) → **Crea PDF unico** → stampare. Quando internet torna, caricare i PDF nella cartella Drive trascinandoli in drive.google.com.
+
+⚠ **Limite:** senza internet ogni PC conosce solo i propri robot, quindi due bambini con lo stesso nome **su PC diversi** possono ricevere lo stesso robot. Sullo stesso PC resta tutto unico.
+
+Se invece internet cade **a metà giornata** con l'app già aperta, non serve la chiavetta: l'app se ne accorge subito, mette i ricordi in Download senza attese e torna su Drive da sola quando la rete riprende.
 
 ---
 
@@ -327,6 +342,7 @@ Nei **poligoni l'angolo non è scritto**: il bambino deve scoprirlo. Ogni sfida 
   - `index.html` — l'app (pubblicata automaticamente su GitHub Pages);
   - `apps-script/Codice.gs` — lo script Drive (da copiare in script.google.com, § 4 A);
   - `avvio/` — i file di avvio da copiare sul desktop dei PC;
+  - `offline/` — avvio e istruzioni del paracadute senza internet (§ 4 E);
   - `docs/ISTRUZIONI.md` — questo documento;
   - `legacy/RobotCoder_v1.html` — versione precedente, solo per emergenza.
 - **Aggiornamenti dell'app:** si pubblicano su GitHub e arrivano a tutti i PC alla riapertura (Ctrl + F5 per forzare). PIN, codice e registro restano memorizzati sui PC.

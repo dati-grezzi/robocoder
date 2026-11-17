@@ -1677,6 +1677,7 @@ const DRV={url:DRIVE_URL_DEFAULT,token:DRIVE_TOKEN_DEFAULT,folderUrl:null,folder
 const GAS=typeof google!=='undefined'&&google.script&&google.script.run;   // pagina servita come web app Apps Script
 const driveOn=()=>!!(GAS||(DRV.url&&DRV.token));
 async function driveCall(action,data={},ms=15000){
+  if(navigator.onLine===false)throw new Error('nessuna connessione a internet');   // rete assente: subito al paracadute, senza attese
   if(GAS){
     const j=await withTimeout(new Promise((res,rej)=>google.script.run.withSuccessHandler(res).withFailureHandler(e=>rej(new Error(e&&e.message||'errore dello script'))).api({action,...data})),ms);
     if(!j||!j.ok)throw new Error(j&&j.err||'errore dello script');
@@ -1707,6 +1708,8 @@ function showDrive(){
   const has=!!DRV.folderUrl;$('drvOpen').classList.toggle('hidden',!has);$('drvLink').classList.toggle('hidden',!has);if(has)$('drvOpen').href=DRV.folderUrl;
 }
 (async()=>{try{const c=await idb.get('drive');if(c&&c.url){Object.assign(DRV,c);}}catch(e){}showDrive();if(driveOn())drivePing();})();
+window.addEventListener('online',()=>{if(driveOn())drivePing().then(ok=>{if(ok)setDirState('ok');});});
+window.addEventListener('offline',()=>{if(driveOn()){DRV.ok=false;DRV.err='nessuna connessione a internet';showDrive();setDirState('down');}});
 setInterval(()=>{if(driveOn()&&DRV.ok===false&&!running)drivePing().then(ok=>{if(ok){setDirState('ok');}});},60000);   // se Drive torna, ricollega da solo
 $('drvCfg').onclick=()=>{$('drvForm').classList.toggle('hidden');$('drvUrl').value=DRV.url||'';$('drvTok').value=DRV.token||'';$('drvUrl').focus();};
 $('drvSave').onclick=async()=>{
@@ -1764,7 +1767,7 @@ async function saveFile(fname,blob,dir,opts={}){
 /* stato della cartella, visibile al docente */
 function setDirState(st){
   const el=$('dirWarn');if(!el)return;
-  if(st==='down'){el.classList.remove('hidden');el.innerHTML=`⚠ Cartella ricordi non raggiungibile: salvo in Download (${fallbackCount} file)`;}
+  if(st==='down'){el.classList.remove('hidden');el.innerHTML=fallbackCount?`⚠ Cartella ricordi non raggiungibile: salvo in Download (${fallbackCount} file)`:'⚠ Cartella ricordi non raggiungibile: i ricordi andranno in Download';}
   else if(st==='ok'&&fallbackCount){el.classList.remove('hidden');el.innerHTML=`✅ Cartella di nuovo raggiungibile · ${fallbackCount} ricordi sono rimasti in Download`;}
   else el.classList.add('hidden');
   const t=$('dirName');

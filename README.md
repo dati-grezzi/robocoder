@@ -16,6 +16,7 @@ Il bambino scrive il suo nome. L'app lo traduce in binario ed esadecimale e da q
 | `index.html` | L'app: un solo file, senza dipendenze, pubblicato con GitHub Pages |
 | `apps-script/Codice.gs` | Ponte Google Apps Script: salva i ricordi PDF e il registro anti-doppioni in una cartella Google Drive della scuola |
 | `avvio/` | File da copiare sul desktop dei PC del laboratorio |
+| `offline/` | Paracadute senza internet: avvio di `index.html` da chiavetta (vedi `offline/LEGGIMI.txt`) |
 | `docs/ISTRUZIONI.md` | Istruzioni complete per docenti e tutor (installazione, giornata, problemi) |
 | `legacy/` | Versione precedente, solo per emergenza |
 
