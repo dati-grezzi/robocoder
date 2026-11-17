@@ -1,0 +1,1982 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Robot Coder — Laboratorio di coding</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f1226;--panel:#171b38;--panel2:#1f2550;--ink:#eef0ff;--mute:#9aa0c8;
+  --acc:#ffb703;--ok:#38d996;--err:#ff4d6d;--line:#2c3368;--cy:#7df9ff;
+  --LH:22px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:Fredoka,system-ui,sans-serif}
+body{background:radial-gradient(1200px 600px at 80% -10%,#26306e 0,transparent 60%),radial-gradient(900px 500px at -10% 110%,#3a1d5c 0,transparent 60%),var(--bg)}
+button{font-family:inherit;cursor:pointer;border:0;border-radius:12px;font-weight:600}
+.hidden{display:none!important}
+.screen{display:none;min-height:100vh}
+.screen.on{display:flex}
+
+/* ---------- START ---------- */
+#sStart{align-items:center;justify-content:center;flex-direction:column;gap:18px;padding:24px;text-align:center}
+#sStart h1{font-size:clamp(34px,5vw,58px);margin:0;letter-spacing:.5px}
+#sStart h1 span{color:var(--acc)}
+#sStart p{color:var(--mute);font-size:20px;margin:0}
+#startBot{width:220px;height:220px}
+.nameRow{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+#nameIn{font:600 28px Fredoka,sans-serif;padding:14px 20px;border-radius:16px;border:3px solid var(--line);background:#0b0e20;color:var(--ink);width:min(380px,80vw);text-align:center;outline:none}
+#nameIn:focus{border-color:var(--acc)}
+.big{font-size:24px;padding:14px 26px;background:var(--acc);color:#1b1300;box-shadow:0 6px 0 #b07d00}
+.big:active{transform:translateY(3px);box-shadow:0 3px 0 #b07d00}
+.big:disabled{opacity:.4;cursor:default}
+#nameMsg{color:var(--err);min-height:24px;font-size:18px}
+
+/* ---------- REVEAL ---------- */
+#sReveal{flex-direction:column;align-items:center;padding:28px 20px;gap:16px}
+#sReveal h2{margin:0;font-size:clamp(22px,3vw,32px);text-align:center}
+.legend{color:var(--mute);font-size:18px;text-align:center}
+.legend b{color:var(--ink)}
+.cards{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;max-width:1100px}
+.card{background:var(--panel);border:2px solid var(--line);border-radius:16px;padding:10px 12px;min-width:118px;text-align:center;opacity:0;transform:translateY(12px) scale(.9);transition:all .35s}
+.card.on{opacity:1;transform:none}
+.cards.small .card{min-width:84px;padding:6px 7px;border-radius:12px}.cards.small .L{font-size:28px}.cards.small .D{font-size:12px}.cards.small .B{font-size:12px;margin:3px 0}.cards.small .H{font-size:20px;min-height:24px}.cards.small .arrow{font-size:10px}
+.card .L{font-size:40px;font-weight:700;line-height:1}
+.card .D{color:var(--mute);font-size:15px;margin-top:4px}
+.card .B{font:600 17px 'JetBrains Mono',monospace;margin:6px 0;letter-spacing:1px}
+.card .B i{font-style:normal;color:#4b5291}.card .B u{text-decoration:none;color:var(--cy)}
+.card .H{font:700 26px 'JetBrains Mono',monospace;color:var(--acc);min-height:32px}
+.arrow{color:#4b5291;font-size:13px}
+.steps{display:flex;flex-direction:column;gap:8px;max-width:900px;width:100%}
+.step{background:var(--panel);border-left:5px solid var(--acc);border-radius:10px;padding:10px 14px;font-size:19px;opacity:0;transform:translateX(-10px);transition:all .4s}
+.step.on{opacity:1;transform:none}
+.step b{font-family:'JetBrains Mono',monospace;color:var(--acc)}
+.step em{font-style:normal;color:var(--cy);font-weight:600}
+.revealRow{display:flex;gap:26px;align-items:center;flex-wrap:wrap;justify-content:center;opacity:0;transform:scale(.85);transition:all .6s}
+.revealRow.on{opacity:1;transform:none}
+#bigBot{width:260px;height:260px}
+#botInfo h3{font-size:44px;margin:0 0 4px;color:var(--acc)}
+#botInfo div{font-size:19px;color:var(--mute);line-height:1.6}
+#botInfo div b{color:var(--ink)}
+
+/* ---------- MAIN ---------- */
+#sMain{flex-direction:column;height:100vh}
+header{display:flex;align-items:center;gap:14px;padding:10px 16px;background:rgba(10,12,30,.6);border-bottom:2px solid var(--line)}
+header .logo{font-weight:700;font-size:22px}
+header .logo span{color:var(--acc)}
+header .who{display:flex;align-items:center;gap:10px;margin-left:auto;margin-right:auto}
+#miniBot{width:46px;height:46px}
+header .who b{font-size:22px;color:var(--acc)}
+header .who small{color:var(--mute);font-size:16px}
+.hbtn{background:var(--panel2);color:var(--ink);padding:9px 14px;font-size:16px;border:2px solid var(--line)}
+.hbtn:hover{border-color:var(--acc)}
+.work{flex:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;padding:14px;min-height:0}
+.panel{background:var(--panel);border:2px solid var(--line);border-radius:18px;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.ptitle{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:2px solid var(--line);font-weight:600;font-size:18px}
+.ptitle .dots{display:flex;gap:6px}.ptitle .dots i{width:12px;height:12px;border-radius:50%;display:block}
+.ptitle .file{color:var(--mute);font:500 14px 'JetBrains Mono',monospace;margin-left:auto}
+
+/* editor */
+.editor{flex:1;display:flex;min-height:0;background:#0b0e22;position:relative}
+.gutter{width:44px;flex:none;overflow:hidden;background:#0d1028;border-right:1px solid var(--line);color:#4b5291;font:15px/var(--LH) 'JetBrains Mono',monospace;text-align:right}
+.gutter .gi{padding:12px 8px 12px 0}
+.gutter .gi div.cur{color:var(--acc);font-weight:600}
+.gutter .gi div.bad{color:var(--err);font-weight:700}
+.codewrap{flex:1;position:relative;overflow:hidden}
+#hl,#code{position:absolute;inset:0;margin:0;padding:12px;border:0;font:15px/var(--LH) 'JetBrains Mono',monospace;white-space:pre;tab-size:4;letter-spacing:0}
+#hl{pointer-events:none;color:#dfe3ff;overflow:visible}
+#code{background:transparent;color:transparent;caret-color:#fff;resize:none;outline:none;overflow:auto;width:100%;height:100%}
+#code::selection{background:rgba(125,249,255,.25);color:transparent}
+#code[readonly]{caret-color:transparent}
+.hll{position:absolute;left:0;right:0;height:var(--LH);display:none;pointer-events:none}
+#activeLine{background:rgba(255,183,3,.16);border-left:4px solid var(--acc)}
+#errLine{background:rgba(255,77,109,.22);border-left:4px solid var(--err)}
+.t-sec{font-weight:700;font-style:normal}
+.t-sec.c1,.chip.c1{color:#ffd166}.t-sec.c2,.chip.c2{color:#7df9ff}.t-sec.c3,.chip.c3{color:#9ef01a}.t-sec.c4,.chip.c4{color:#ff9e64}.t-sec.c5,.chip.c5{color:#b8c0ff}
+.chip{display:inline-block;font:700 12px Fredoka,sans-serif;padding:1px 8px;border-radius:20px;background:rgba(255,255,255,.07);border:1px solid currentColor;white-space:nowrap;vertical-align:1px}
+.parti{font-size:15px;color:var(--mute);margin-bottom:10px;line-height:1.9}
+.sfida ol{margin:4px 0 0;padding-left:18px;color:var(--mute);font-size:14px;line-height:1.55}
+.sfida ol li{margin:2px 0}.sfida i{color:#6b7299}
+.hint{margin-top:6px;font-size:14px;color:#cfd3f5;background:#0b0e22;border:1px dashed var(--line);border-radius:9px;padding:5px 9px}
+.hint summary{cursor:pointer;color:var(--acc);font-weight:600;list-style:none}.hint summary::-webkit-details-marker{display:none}
+.hint b{display:inline;font-size:inherit}.hint[open]{border-style:solid}.hint.sol summary{color:#ff9e64}
+.t-c{color:#6b7299;font-style:italic}.t-s{color:#9ef01a}.t-n{color:#ffb703}.t-k{color:#ff79c6;font-weight:600}.t-f{color:#7df9ff;font-weight:600}.t-v{color:#e0e4ff}.t-x{color:#ff4d6d}
+.editor.glitch{animation:shake .12s linear infinite}
+.editor.glitch #hl{text-shadow:2px 0 #ff004c,-2px 0 #00e1ff}
+@keyframes shake{0%{transform:translate(0,0)}25%{transform:translate(-3px,1px)}50%{transform:translate(2px,-2px)}75%{transform:translate(-1px,2px)}100%{transform:translate(0,0)}}
+
+.errbox{display:none;background:#2a0f1d;border-top:3px solid var(--err);padding:12px 16px;font-size:18px}
+.errbox.on{display:block;animation:pop .3s}
+.errbox .t{color:var(--err);font-weight:700;font-size:20px}
+.errbox .h{color:#ffd1da;margin-top:4px}
+.errbox .h code{font-family:'JetBrains Mono',monospace;background:#0b0e22;padding:1px 6px;border-radius:6px;color:#9ef01a}
+@keyframes pop{from{transform:scale(.97);opacity:0}to{transform:none;opacity:1}}
+.bar{display:flex;gap:10px;padding:12px;border-top:2px solid var(--line);flex-wrap:wrap;align-items:center}
+.run{background:var(--ok);color:#06281a;font-size:22px;padding:12px 24px;box-shadow:0 5px 0 #1f8a5c}
+.run:active{transform:translateY(3px);box-shadow:0 2px 0 #1f8a5c}
+.stop{background:var(--err);color:#fff;font-size:20px;padding:12px 20px;box-shadow:0 5px 0 #a3203a}
+.reset{background:var(--panel2);color:var(--ink);font-size:18px;padding:12px 18px;border:2px solid var(--line)}
+.reset:hover{border-color:var(--acc)}
+.reset.pulse{animation:pulse 1s infinite;border-color:var(--acc)}
+@keyframes pulse{50%{box-shadow:0 0 0 6px rgba(255,183,3,.25)}}
+.bar .tip{color:var(--mute);font-size:14px;margin-left:auto}
+button:disabled{opacity:.35;cursor:default}
+
+/* arena */
+.arenaWrap{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:10px;background:#12163a}
+#arena{border-radius:14px;box-shadow:0 0 0 3px var(--line),0 10px 30px rgba(0,0,0,.4)}
+.scopeBox{border-top:2px solid var(--line);background:#070918;padding:8px 10px 6px}
+.sig{font:600 14px 'JetBrains Mono',monospace;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px}
+.sig .c{color:#9ef01a}.sig .x{color:var(--acc)}.sig .b{color:var(--cy)}
+.sig .lbl{font-family:Fredoka,sans-serif;color:var(--ink);margin-right:6px}
+#scope{position:absolute;inset:0;display:block}
+.vtabs{display:flex;border-bottom:2px solid var(--line)}
+.vtabs button{flex:1;background:transparent;color:var(--mute);padding:11px 8px;font-size:17px;border-radius:0}
+.vtabs button.on{color:var(--ink);background:var(--panel2);box-shadow:inset 0 -3px 0 var(--acc)}
+.vtabs button:hover{color:var(--ink)}
+.view{flex:1;min-height:0;display:flex;flex-direction:column}
+.arenaWrap{position:relative}
+.floatBtn{position:absolute;top:12px;right:12px;background:var(--acc);color:#1b1300;padding:9px 15px;font-size:17px;box-shadow:0 4px 0 #b07d00;z-index:2}
+.floatBtn:active{transform:translateY(2px);box-shadow:0 2px 0 #b07d00}
+#rightPanel{position:relative}
+.overlay{position:absolute;left:0;right:0;bottom:0;top:49px;background:rgba(15,18,40,.98);display:flex;flex-direction:column;z-index:5;animation:pop .2s}
+.ovHead{display:flex;align-items:center;padding:10px 14px;font-weight:700;font-size:20px;border-bottom:2px solid var(--line);color:var(--acc)}
+.ovX{margin-left:auto;background:var(--panel2);color:var(--ink);border:2px solid var(--line);padding:6px 12px;font-size:15px}
+.ovX:hover{border-color:var(--acc)}
+.ovBody{flex:1;overflow:auto;padding:14px}
+.pbtn{margin-left:14px;background:var(--panel2);color:var(--ink);border:2px solid var(--line);padding:4px 12px;font-size:15px;border-radius:9px}
+.pbtn:hover{border-color:var(--acc)}
+.conGrid{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.55fr) minmax(230px,1fr)}
+.conLogWrap{display:flex;flex-direction:column;min-height:0;border-right:2px solid var(--line)}
+.conHead{font-weight:600;font-size:15px;padding:8px 12px;color:var(--acc);border-bottom:1px solid var(--line);background:#12163a}
+.conLog{flex:1;overflow:auto;padding:8px 10px;font:13.5px/1.65 'JetBrains Mono',monospace;background:#070918;color:#dfe3ff}
+.cl{display:flex;white-space:pre-wrap;word-break:break-word;border-left:2px solid transparent;margin:1px 0;padding-right:4px}
+.cl .ln{color:#4b5291;flex:none;width:64px}.cl .tx{flex:1;min-width:0}
+.cl .ex{color:var(--mute)}.cl .vv{color:var(--acc);font-weight:600}
+.cl.loop{color:#ff9e64}.cl.t{color:var(--ok)}.cl.f{color:var(--err)}.cl.out{color:#9ef01a}
+.cl.sys{color:var(--cy);font-weight:600}.cl.err{color:var(--err);font-weight:700;background:#2a0f1d}
+.cl.now{background:rgba(255,183,3,.12);border-left-color:var(--acc)}
+.conSide{display:flex;flex-direction:column;min-height:0;overflow:auto}
+.memBox{display:flex;flex-wrap:wrap;gap:8px;padding:10px}
+.memEmpty{color:#6b7299;font:italic 14px Fredoka,sans-serif;padding:4px}
+.mem{background:#0b0e22;border:2px solid var(--line);border-radius:12px;padding:6px 10px;min-width:92px;text-align:center}
+.mem .n{font:600 14px Fredoka,sans-serif;color:#ffd166}
+.mem .v{font:700 22px 'JetBrains Mono',monospace;color:var(--ink);word-break:break-all}
+.mem .o{font-size:11px;color:var(--mute);min-height:14px}
+.mem.flash{animation:memflash .7s}
+@keyframes memflash{0%{border-color:var(--acc);background:#4a3500;transform:scale(1.08)}100%{transform:none}}
+.botState{padding:8px 12px;font:14px/1.75 'JetBrains Mono',monospace;color:var(--mute)}
+.botState b{color:var(--ink)}
+.botState .sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;border:1px solid #fff4}
+.miniArena{display:block;margin:6px auto 12px;border-radius:10px;box-shadow:0 0 0 2px var(--line);flex:none}
+.scopeBox.big{flex:1;display:flex;flex-direction:column;min-height:0;border-top:0}
+.scopeArea{flex:1;min-height:120px;position:relative}
+.dentroBottom{display:flex;gap:14px;padding:10px 14px;border-top:2px solid var(--line);background:var(--panel2);max-height:44%;overflow:auto;align-items:flex-start}
+.dentroTxt{flex:1;columns:2 230px;font-size:15px}
+.tabs{display:flex;border-top:2px solid var(--line)}
+.tabs button{flex:1;background:transparent;color:var(--mute);padding:10px;font-size:17px;border-radius:0}
+.tabs button.on{color:var(--ink);background:var(--panel2);box-shadow:inset 0 3px 0 var(--acc)}
+.tabbody{height:185px;overflow:auto;padding:12px 14px;font-size:17px;background:var(--panel2)}
+.sfide{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px}
+.sfida{background:var(--panel);border:2px solid var(--line);border-radius:12px;padding:8px 10px}
+.sfida b{display:block;font-size:17px}
+.sfida span{color:var(--mute);font-size:15px}
+.sfida code,.ref code{font-family:'JetBrains Mono',monospace;color:#9ef01a;font-size:14px}
+.ref{columns:2 260px;column-gap:20px}
+.ref div{break-inside:avoid;margin-bottom:6px;font-size:15px;color:var(--mute)}
+.ref div code{color:#7df9ff}
+.ref h4{margin:6px 0 4px;color:var(--acc);font-size:16px;break-after:avoid}
+
+.evBadge{display:inline-block;font:600 17px Fredoka,sans-serif;color:var(--acc);border:2px solid var(--acc);border-radius:30px;padding:4px 16px;margin-top:-6px}
+.tbox{flex-direction:column;width:min(640px,94vw);font-size:17px;gap:14px}
+.tbox h3{margin:0;color:var(--acc);font-size:24px}
+.tview{display:flex;flex-direction:column;gap:12px}.tview p{margin:0;color:var(--mute)}
+.pin{font:600 26px 'JetBrains Mono',monospace;letter-spacing:6px;text-align:center;padding:10px;border-radius:12px;border:2px solid var(--line);background:#0b0e20;color:var(--ink);outline:none}
+.pin:focus{border-color:var(--acc)}
+.trow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:8px 0;border-bottom:1px solid var(--line)}
+.trow>div{flex:1;min-width:220px}.trow small{color:var(--mute)}
+.trow .sec{font-size:15px;padding:8px 12px}
+.txt{display:block;width:100%;margin-top:3px;font:14px 'JetBrains Mono',monospace;padding:8px 10px;border-radius:9px;border:2px solid var(--line);background:#0b0e20;color:var(--ink);outline:none}.txt:focus{border-color:var(--acc)}
+.sec.danger{border-color:#7a2236}.sec.danger:hover{border-color:var(--err)}
+.tmsg{min-height:22px;font-size:15px;color:var(--mute)}.tmsg.ok{color:var(--ok)}.tmsg.bad{color:var(--err)}
+#mMsg.ok,#certMsg.ok{color:var(--ok)}#mMsg.warn,#certMsg.warn{color:var(--acc)}
+.dirwarn{font-size:13px;color:#ffd166;background:#3a2a00;border:1px solid #8a6500;border-radius:9px;padding:5px 9px;max-width:300px}#mMsg.bad{color:var(--err)}
+#mMsg small,#certMsg small{color:var(--mute);word-break:break-all}
+/* modal ricordo */
+.modal{position:fixed;inset:0;background:rgba(5,6,18,.82);display:none;align-items:center;justify-content:center;z-index:50;padding:20px}
+.modal.on{display:flex}
+.mbox{background:var(--panel);border:2px solid var(--line);border-radius:18px;padding:16px;display:flex;gap:18px;max-height:96vh;align-items:stretch}
+#certPrev{height:min(82vh,900px);aspect-ratio:210/297;background:#fff;border-radius:6px;box-shadow:0 10px 30px rgba(0,0,0,.5);display:block}
+.mside{display:flex;flex-direction:column;gap:12px;width:260px;font-size:17px}
+.mside h3{margin:0;font-size:24px;color:var(--acc)}
+.mside p{margin:0;color:var(--mute)}
+.mside label{display:flex;gap:8px;align-items:center;cursor:pointer}
+.mside input[type=checkbox]{width:20px;height:20px;accent-color:var(--acc)}
+#certMsg{min-height:44px;color:var(--mute);font-size:15px}
+#certMsg.bad{color:var(--err)}#certMsg.ok{color:var(--ok)}
+.sec{background:var(--panel2);color:var(--ink);border:2px solid var(--line);font-size:18px;padding:12px 18px}
+.sec:hover{border-color:var(--acc)}
+
+@media (max-width:900px){
+  .work{grid-template-columns:1fr;overflow:auto}
+  #sMain{height:auto;min-height:100vh}
+  .editor{min-height:340px}
+  .arenaWrap{min-height:360px}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ START ============ -->
+<section id="sStart" class="screen on">
+  <canvas id="startBot"></canvas>
+  <h1 id="startTitle" style="user-select:none">Robot <span>Coder</span></h1>
+  <div id="evBadge" class="evBadge"></div>
+  <p>Scrivi il tuo nome: il computer lo trasformerà nel tuo robot!</p>
+  <div class="nameRow">
+    <input id="nameIn" maxlength="30" placeholder="Il tuo nome" autocomplete="off" spellcheck="false">
+    <button class="big" id="makeBtn">Crea il mio robot ⚡</button>
+  </div>
+  <div id="nameMsg"></div>
+</section>
+
+<!-- ============ AREA DOCENTE (Ctrl+Alt+D o tieni premuto il titolo) ============ -->
+<div class="modal" id="teachModal">
+  <div class="mbox tbox">
+    <h3>🔒 Area docente</h3>
+    <div id="tLock" class="tview">
+      <p>Inserisci il PIN docente.</p>
+      <input id="tPin" class="pin" type="password" inputmode="numeric" autocomplete="off" maxlength="12">
+      <button class="big" id="tEnter">Entra</button>
+      <div class="tmsg" id="tLockMsg"></div>
+    </div>
+    <div id="tCreate" class="tview hidden">
+      <p id="tCreateTxt"></p>
+      <input id="tNew1" class="pin" type="password" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="Nuovo PIN">
+      <input id="tNew2" class="pin" type="password" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="Ripeti il PIN">
+      <button class="big" id="tCreateBtn">Salva PIN</button>
+      <div class="tmsg" id="tCreateMsg"></div>
+    </div>
+    <div id="tPanel" class="tview hidden">
+      <div class="trow"><div>☁ Cartella Drive: <b id="drvName">non configurata</b></div><button class="sec" id="drvCfg">Configura</button><a class="sec hidden" id="drvOpen" target="_blank" rel="noopener" style="text-decoration:none">Apri</a><button class="sec hidden" id="drvLink">🖥 Collegamento sul desktop</button></div>
+      <div class="trow hidden" id="drvForm"><div style="flex-basis:100%;display:flex;flex-direction:column;gap:6px">
+        <label>URL dello script (finisce con /exec) <small>— di solito è già inserito</small><input id="drvUrl" class="txt" spellcheck="false" autocomplete="off"></label>
+        <label>Codice<input id="drvTok" class="txt" spellcheck="false" autocomplete="off"></label>
+        <div style="display:flex;gap:8px"><button class="sec" id="drvSave">Salva e prova</button><button class="sec danger" id="drvClear">Scollega</button></div></div></div>
+      <div class="trow"><div>📁 Cartella locale <small>(alternativa a Drive)</small>: <b id="dirName">…</b></div><button class="sec" id="dirBtn">Scegli cartella</button></div>
+      <div class="trow"><div>🗂 Ricordi della giornata</div><button class="sec" id="mergeBtn">Unisci ricordi</button></div>
+      <div class="trow"><div>🎫 Evento <small>(cambia il ricordo PDF)</small></div><select id="evSel" class="txt" style="width:auto;flex:1;min-width:220px"></select></div>
+      <div class="trow"><div>📋 Registro robot: <b id="tRegInfo">…</b></div></div>
+      <div class="trow"><div>🧹 Azzera il registro <small>(dopo le prove, prima dell'open day)</small></div><button class="sec danger" id="tResetLocal">Solo questo PC</button><button class="sec danger" id="tResetAll">Tutti i PC</button></div>
+      <div class="trow"><div>🔑 PIN docente</div><button class="sec" id="tChangePin">Cambia PIN</button></div>
+      <div class="tmsg" id="tPanelMsg"></div>
+    </div>
+    <button class="sec" id="tClose">Chiudi e blocca</button>
+  </div>
+</div>
+
+<div class="modal" id="whoModal">
+  <div class="mbox" style="flex-direction:column;width:min(600px,94vw);font-size:19px">
+    <h3 style="margin:0;color:var(--acc);font-size:26px">🤖 Questo nome c'è già!</h3>
+    <p id="whoText" style="margin:0"></p>
+    <div id="whoList" style="display:flex;flex-direction:column;gap:8px"></div>
+    <button class="big" id="whoNew"></button>
+  </div>
+</div>
+
+<div class="modal" id="mergeModal">
+  <div class="mbox" style="flex-direction:column;width:min(560px,94vw);font-size:17px">
+    <h3 style="margin:0;color:var(--acc);font-size:24px">🗂 Unisci i ricordi in un solo PDF</h3>
+    <p style="margin:0;color:var(--mute)">Scegli la cartella dei ricordi (anche sulla chiavetta) oppure seleziona i file PDF. Le pagine escono in ordine di creazione, pronte per una sola stampa.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="sec hidden" id="mDrive">☁ Dalla cartella Drive</button>
+      <button class="sec" id="mDir">📁 Scegli cartella</button>
+      <label class="sec" style="border-radius:12px;font-weight:600;cursor:pointer">📄 Scegli file PDF<input type="file" id="mFiles" multiple accept=".pdf,application/pdf" hidden></label>
+    </div>
+    <div id="mInfo" style="color:var(--ink)"></div>
+    <button class="big" id="mGo" disabled>⬇ Crea PDF unico</button>
+    <div id="mMsg" style="min-height:24px"></div>
+    <button class="sec" id="mClose">Chiudi</button>
+  </div>
+</div>
+
+<!-- ============ REVEAL ============ -->
+<section id="sReveal" class="screen">
+  <h2>Sto traducendo il tuo nome nel linguaggio dei computer…</h2>
+  <div class="legend">lettera <b>→</b> numero <b>→</b> binario (solo 0 e 1) <b>→</b> esadecimale (0-9 e A-F)</div>
+  <div id="cards" class="cards"></div>
+  <div id="steps" class="steps"></div>
+  <div class="revealRow" id="revealRow">
+    <canvas id="bigBot"></canvas>
+    <div id="botInfo"></div>
+  </div>
+  <div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center">
+    <button id="goBtn" class="big hidden">Programmami! ▶</button>
+    <button id="certBtn2" class="sec hidden">🖨 Il mio ricordo</button>
+  </div>
+</section>
+
+<!-- ============ RICORDO PDF ============ -->
+<div class="modal" id="certModal">
+  <div class="mbox">
+    <img id="certPrev" alt="Anteprima del ricordo A4">
+    <div class="mside">
+      <h3>🖨 Il tuo ricordo</h3>
+      <p>Un foglio A4 con il tuo robot, il tuo nome in binario ed esadecimale e i tuoi impulsi elettrici.</p>
+      <label><input type="checkbox" id="certDraw" checked> Metti anche il mio disegno</label>
+      <button class="big" id="certSave">⬇ Scarica PDF A4</button>
+      <div id="certMsg"></div>
+      <button class="sec" id="certClose" style="margin-top:auto">Chiudi</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MAIN ============ -->
+<section id="sMain" class="screen">
+  <header>
+    <div class="logo">Robot <span>Coder</span></div>
+    <div class="who"><canvas id="miniBot"></canvas><div><b id="hdrName">—</b><br><small id="hdrKid"></small></div></div>
+    <span id="dirWarn" class="dirwarn hidden"></span>
+    <button class="hbtn" id="certBtn">🖨 Il mio ricordo</button>
+    <button class="hbtn" id="voiceBtn" title="Voce del robot">🗣 Voce</button>
+    <button class="hbtn" id="muteBtn" title="Suoni">🔊</button>
+    <button class="hbtn" id="newKidBtn">👋 Nuovo bambino</button>
+  </header>
+  <div class="work">
+    <div class="panel">
+      <div class="ptitle"><div class="dots"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i></div>Codice<button class="pbtn" id="refBtn">📖 Comandi</button><span class="file" id="fileName">robot.py</span></div>
+      <div class="editor" id="editor">
+        <div class="gutter"><div class="gi" id="gutter"></div></div>
+        <div class="codewrap">
+          <div class="hll" id="activeLine"></div>
+          <div class="hll" id="errLine"></div>
+          <pre id="hl" aria-hidden="true"></pre>
+          <textarea id="code" spellcheck="false" wrap="off" autocapitalize="off" autocomplete="off" autocorrect="off"></textarea>
+        </div>
+      </div>
+      <div class="errbox" id="errBox"><div class="t" id="errT"></div><div class="h" id="errH"></div></div>
+      <div class="bar">
+        <button class="run" id="runBtn">▶ Esegui</button>
+        <button class="stop" id="stopBtn" disabled>■ Stop</button>
+        <button class="reset" id="resetBtn">↺ Ripristina</button>
+        <span class="tip">Ctrl+Invio = Esegui</span>
+      </div>
+    </div>
+    <div class="panel" id="rightPanel">
+      <div class="vtabs"><button class="on" data-view="vArena">🤖 Arena</button><button data-view="vConsole">🖥 Console</button><button data-view="vDentro">⚡ Dentro il robot</button></div>
+      <div class="view" id="vArena">
+        <div class="arenaWrap" id="arenaWrap"><canvas id="arena"></canvas><button class="floatBtn" id="sfideBtn">🏆 Sfide</button></div>
+      </div>
+      <div class="view hidden" id="vConsole">
+        <div class="conGrid">
+          <div class="conLogWrap"><div class="conHead">📜 Cosa fa il programma, passo per passo</div><div id="conLog" class="conLog"><div class="memEmpty">Premi ▶ Esegui: qui vedrai ogni riga che il computer esegue.</div></div></div>
+          <div class="conSide">
+            <div class="conHead">🧠 Memoria: le variabili</div>
+            <div id="memBox" class="memBox"><div class="memEmpty">Ancora nessuna variabile</div></div>
+            <div class="conHead">📍 Il robot</div>
+            <div id="botState" class="botState"></div>
+            <canvas class="miniArena" id="mini1"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="view hidden" id="vDentro">
+        <div class="scopeBox big">
+          <div class="sig"><span class="lbl">⚡ Impulsi elettrici</span><span class="c" id="sigCmd">in attesa…</span> <span id="sigArr"></span> <span class="x" id="sigHex"></span> <span id="sigArr2"></span> <span class="b" id="sigBin"></span></div>
+          <div class="scopeArea" id="scopeArea"><canvas id="scope"></canvas></div>
+        </div>
+        <div class="dentroBottom"><div class="ref dentroTxt">
+          <h4>Il computer capisce solo due cose</h4>
+          <div><b style="color:#7df9ff">1</b> = passa corrente (3,3 volt) · <b style="color:#7df9ff">0</b> = non passa corrente (0 volt). Tutto il resto è fatto di 1 e di 0.</div>
+          <h4>Dal codice agli impulsi</h4>
+          <div>Ogni riga diventa un <b>numero</b> (in esadecimale), il numero diventa una fila di <b>bit</b>, e ogni bit è un <b>impulso elettrico</b> che corre nei fili: guarda la riga <b>DATI</b> qui sopra.</div>
+          <h4>I motori</h4>
+          <div>Il motore riceve impulsi velocissimi, acceso-spento-acceso-spento (si chiama <b>PWM</b>). Impulsi più lunghi = motore più veloce: prova a cambiare <code>velocita</code> e guarda come si allargano.</div>
+          <div>Per girare, un motore va avanti e l'altro indietro: la corrente nell'altro motore va al contrario (gli impulsi vanno <b>sotto</b> la linea).</div>
+          <h4>Nel robot vero</h4>
+          <div>Il LEGO SPIKE fa esattamente questo: il codice che scrivi diventa impulsi che il hub manda ai motori attraverso i cavi.</div>
+          <h4>E quando c'è un errore?</h4>
+          <div>Gli impulsi diventano disturbo: il robot non sa più cosa fare. Per questo un solo errore blocca tutto.</div>
+          </div><canvas class="miniArena" id="mini2"></canvas></div>
+      </div>
+      <div class="overlay hidden" id="ovSfide"><div class="ovHead">🏆 Sfide<button class="ovX" data-close="ovSfide">✕ Chiudi</button></div><div class="ovBody">
+        <div class="parti">Il codice è diviso in <b>sezioni</b>: <span class="chip c1">1 · Variabili</span> <span class="chip c2">2 · Penna</span> <span class="chip c3">3 · Output</span> <span class="chip c4">4 · Ciclo</span> <span class="chip c5">5 · Fine</span><br>Ogni sfida ti dice <b>in quale sezione</b> cambiare. Se qualcosa va storto: <b>↺ Ripristina</b>.</div>
+        <div class="sfide">
+          <div class="sfida"><b>🔺 Triangolo</b><ol>
+            <li><span class="chip c4">4 · Ciclo</span> cambia in <code>ripeti 3 volte:</code></li>
+            <li><span class="chip c1">1 · Variabili</span> <code>angolo = ?</code> <b>Di quanto deve girare il robot?</b> Prova, premi Esegui: il robot ti dice se la figura si chiude!</li></ol>
+            <details class="hint"><summary>💡 Indizio</summary>Alla fine il robot deve tornare a guardare dove guardava all'inizio: in tutto fa <b>un giro completo, 360°</b>. Le curve sono 3…</details>
+            <details class="hint sol"><summary>🔑 Soluzione</summary><code>angolo = 120</code> perché 360 ÷ 3 = 120</details></div>
+          <div class="sfida"><b>⬠ Pentagono</b><ol>
+            <li><span class="chip c4">4 · Ciclo</span> <code>ripeti 5 volte:</code></li>
+            <li><span class="chip c1">1 · Variabili</span> <code>angolo = ?</code> e <code>lato = 100</code></li></ol>
+            <details class="hint"><summary>💡 Indizio</summary>Sempre un giro completo, 360°, ma diviso in 5 curve.</details>
+            <details class="hint sol"><summary>🔑 Soluzione</summary><code>angolo = 72</code> perché 360 ÷ 5 = 72</details></div>
+          <div class="sfida"><b>⬡ Esagono arcobaleno</b><ol>
+            <li><span class="chip c4">4 · Ciclo</span> <code>ripeti 6 volte:</code></li>
+            <li><span class="chip c1">1 · Variabili</span> <code>angolo = ?</code> e <code>lato = 80</code></li>
+            <li><span class="chip c2">2 · Penna</span> <code>colore("arcobaleno")</code></li></ol>
+            <details class="hint"><summary>💡 Indizio</summary>Hai già capito il trucco? 360° diviso il numero di lati.</details>
+            <details class="hint sol"><summary>🔑 Soluzione</summary><code>angolo = 60</code> perché 360 ÷ 6 = 60</details></div>
+          <div class="sfida"><b>⭐ Stella</b><ol>
+            <li><span class="chip c4">4 · Ciclo</span> <code>ripeti 5 volte:</code></li>
+            <li><span class="chip c1">1 · Variabili</span> <code>angolo = 144</code> e <code>lato = 180</code></li></ol></div>
+          <div class="sfida"><b>🌀 Spirale</b><ol>
+            <li><span class="chip c1">1 · Variabili</span> <code>lato = 10</code> e <code>velocita = 15</code></li>
+            <li><span class="chip c4">4 · Ciclo</span> sostituisci la riga <code>ripeti 4 volte:</code> con <code>finché lato &lt; 250:</code></li>
+            <li><span class="chip c4">4 · Ciclo</span> aggiungi in fondo al ciclo, spostata a destra come le altre righe: <code>lato = lato + 10</code></li></ol></div>
+          <div class="sfida"><b>⚡ Velocità</b><ol>
+            <li><span class="chip c1">1 · Variabili</span> <code>velocita = 1</code> → Esegui</li>
+            <li><span class="chip c1">1 · Variabili</span> <code>velocita = 20</code> → Esegui</li>
+            <li><i>Poi apri ⚡ Dentro il robot: gli impulsi dei motori cambiano!</i></li></ol></div>
+          <div class="sfida"><b>💬 Il robot parla</b><ol>
+            <li><span class="chip c3">3 · Output</span> cambia il testo tra le virgolette di <code>di("…")</code></li>
+            <li><span class="chip c4">4 · Ciclo</span> aggiungi dentro al ciclo <code>di("giro!")</code></li></ol></div>
+          <div class="sfida"><b>🎲 Sorpresa</b><ol>
+            <li><span class="chip c4">4 · Ciclo</span> sostituisci <code>ripeti 4 volte:</code> con <code>per sempre:</code></li>
+            <li><span class="chip c4">4 · Ciclo</span> aggiungi dentro al ciclo <code>angolo = casuale(60, 170)</code></li>
+            <li><i>Si ferma solo con ■ Stop</i></li></ol></div>
+          <div class="sfida"><b>💥 Rompilo!</b><ol>
+            <li><span class="chip c4">4 · Ciclo</span> scrivi <code>avnti</code> invece di <code>avanti</code> → Esegui</li>
+            <li>Leggi l'errore, poi correggi o premi <b>↺ Ripristina</b></li></ol></div>
+        </div>
+      </div></div>
+      <div class="overlay hidden" id="ovRef"><div class="ovHead">📖 Comandi<button class="ovX" data-close="ovRef">✕ Chiudi</button></div><div class="ovBody"><div class="ref">
+          <h4>Movimento <span class="chip c4">4 · Ciclo</span></h4>
+          <div><code>avanti(100)</code> va avanti di 100 passi</div>
+          <div><code>indietro(50)</code> torna indietro</div>
+          <div><code>destra(90)</code> gira a destra di 90°</div>
+          <div><code>sinistra(90)</code> gira a sinistra</div>
+          <div><code>centro()</code> torna al centro</div>
+          <h4>Tempo e parole <span class="chip c3">3 · Output</span></h4>
+          <div><code>attendi(1)</code> aspetta 1 secondo</div>
+          <div><code>di("ciao")</code> il robot parla</div>
+          <h4>Disegno <span class="chip c2">2 · Penna</span></h4>
+          <div><code>colore("rosso")</code> rosso, arancione, giallo, verde, azzurro, blu, viola, rosa, nero, marrone, grigio, oro, arcobaleno</div>
+          <div><code>spessore(8)</code> linea più grossa</div>
+          <div><code>penna_su()</code> / <code>penna_giu()</code> smette / ricomincia a disegnare</div>
+          <div><code>cancella()</code> cancella il disegno</div>
+          <h4>Variabili <span class="chip c1">1 · Variabili</span></h4>
+          <div><code>lato = 100</code> crea una variabile</div>
+          <div><code>lato = lato + 10</code> la fa crescere</div>
+          <div><code>velocita = 5</code> speciale: da 1 a 20</div>
+          <div><code>casuale(1, 10)</code> un numero a sorpresa</div>
+          <h4>Cicli <span class="chip c4">4 · Ciclo</span></h4>
+          <div><code>ripeti 4 volte:</code> ripete un numero preciso di volte</div>
+          <div><code>finché lato &lt; 200:</code> ripete finché la condizione è vera</div>
+          <div><code>per sempre:</code> non si ferma mai (usa ■ Stop)</div>
+          <h4>Decisioni</h4>
+          <div><code>se lato &gt; 100:</code> … <code>altrimenti:</code></div>
+          <div>Confronti: <code>&lt; &gt; &lt;= &gt;= == !=</code></div>
+          <div>Le righe dentro un ciclo vanno spostate a destra con il tasto <b>Tab</b></div>
+        </div></div></div>
+    </div>
+  </div>
+</section>
+
+<script>
+"use strict";
+/* =========================================================
+   IDENTITÀ: nome → byte → binario → esadecimale → robot
+   ========================================================= */
+const NICKS=['Turbo','Razzo','Fulmine','Bullone','Scintilla','Pixel','Cometa','Vortice','Magma','Saetta','Chip','Lampo','Bit','Nova','Ciclone','Turbina'];
+const EYES=['occhi tondi','occhioni','visore','occhi quadrati'];
+const ANTS=['antenna a pallina','doppia antenna','antenna a molla','parabola'];
+const BODIES=['corpo largo','corpo alto','corpo tondo'];
+const MOUTHS=['sorriso','dentoni','bocca a O'];
+const hex2=n=>n.toString(16).toUpperCase().padStart(2,'0');
+
+function cleanName(s){return s.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/['’\-_.]/g,' ').replace(/[^A-Za-z ]/g,'').replace(/\s+/g,' ').trim().slice(0,22).trim();}
+const LBL=b=>b===32?'␣':String.fromCharCode(b);
+/* palette neutra: niente rosa, magenta o viola (tonalità 260°–350° escluse) */
+const HUES=[0,18,35,48,90,125,150,170,188,200,212,225,240];
+function makeIdentity(raw,k=1){
+  const c=cleanName(raw);
+  const disp=c.toLowerCase().replace(/(^|\s)([a-z])/g,(m,a,b)=>a+b.toUpperCase());
+  const nameBytes=[...disp].map(ch=>ch.charCodeAt(0));
+  const bytes=k>1?[...nameBytes,k&255]:nameBytes;           // omonimi: numero di serie come byte in più
+  const n=bytes.length;
+  const sum=bytes.reduce((a,b)=>a+b,0);
+  const xor=bytes.reduce((a,b)=>a^b,0);
+  const sumHex=sum.toString(16).toUpperCase();
+  const tail=sumHex.slice(-2).padStart(2,'0');
+  const sigla=disp[0]+tail;
+  const nickIdx=xor&15;
+  const nick=NICKS[nickIdx];
+  const traits={hue:HUES[(sum*7+xor)%HUES.length],eye:bytes[0]%4,ant:bytes[1%n]%4,mouth:xor%3,body:bytes[n-1]%3,cheeks:sum%2===0,sigla};
+  return {
+    kid:disp,show:(raw.trim().replace(/[^\p{L} '’\-]/gu,'').replace(/\s+/g,' ').slice(0,30).toLowerCase().replace(/(^|[\s'’\-])(\p{L})/gu,(m,a,b)=>a+b.toUpperCase())||disp),
+    serial:k,nameLen:nameBytes.length,bytes,sum,xor,sumHex,tail,sigla,nickIdx,nick,full:sigla+' '+nick,traits,
+    sig:[traits.hue,traits.eye,traits.ant,traits.mouth,traits.body,traits.cheeks?1:0].join('-')
+  };
+}
+const LBLI=(i,b)=>ID&&i>=ID.nameLen?'#'+b:LBL(b);
+
+/* =========================================================
+   DISEGNO DEL ROBOT (canvas, coordinate in un box ~130 unità)
+   ========================================================= */
+function rr(ctx,x,y,w,h,r){ctx.beginPath();if(ctx.roundRect)ctx.roundRect(x,y,w,h,r);else ctx.rect(x,y,w,h);ctx.fill();}
+function circ(ctx,x,y,r){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();}
+function drawRobot(ctx,x,y,size,tr,st={}){
+  const t=st.t||0,g=st.glitch||0,mv=st.moving?1:0;
+  ctx.save();ctx.translate(x,y);const k=size/130;ctx.scale(k,k);
+  if(g){ctx.translate((Math.random()-.5)*10*g,(Math.random()-.5)*5*g);}
+  const sat=g?12:72,h=tr.hue;
+  const C=(l)=>`hsl(${h},${sat}%,${l}%)`;
+  // ombra
+  ctx.fillStyle='rgba(0,0,0,.22)';ctx.beginPath();ctx.ellipse(0,60,42,7,0,0,Math.PI*2);ctx.fill();
+  // ruote
+  ctx.fillStyle='#2b2f4a';rr(ctx,-36,42,24,16,7);rr(ctx,12,42,24,16,7);
+  ctx.fillStyle='#555b85';const wr=(t*(mv?12:0))%6;
+  for(let i=0;i<3;i++){ctx.fillRect(-32+((i*8+wr)%20),48,3,4);ctx.fillRect(16+((i*8+wr)%20),48,3,4);}
+  const bob=Math.sin(t*(mv?9:3))*(mv?1.5:2.2);
+  ctx.translate(0,bob);
+  // braccia
+  const sw=Math.sin(t*(mv?10:3.2))*(mv?18:8);
+  for(const s of[-1,1]){
+    ctx.save();ctx.translate(s*38,6);ctx.rotate((s*(-18)+s*sw)*Math.PI/180);
+    ctx.fillStyle=C(44);rr(ctx,-6,0,12,28,6);ctx.fillStyle=C(70);circ(ctx,0,31,7);ctx.restore();
+  }
+  // corpo
+  ctx.fillStyle=C(52);
+  if(tr.body===0)rr(ctx,-38,-6,76,50,13);
+  else if(tr.body===1)rr(ctx,-31,-10,62,56,11);
+  else{ctx.beginPath();ctx.ellipse(0,19,39,28,0,0,Math.PI*2);ctx.fill();}
+  ctx.fillStyle='rgba(255,255,255,.12)';rr(ctx,-26,-4,20,8,4);
+  // schermo pancia
+  ctx.fillStyle='#10132b';rr(ctx,-21,8,42,22,6);
+  ctx.fillStyle=g?'#ff4d6d':C(78);ctx.font='700 12px "JetBrains Mono",monospace';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(g?(Math.random()<.5?'ERR':'#@!'):tr.sigla,0,19.5);
+  // collo
+  ctx.fillStyle=C(36);rr(ctx,-8,-14,16,10,3);
+  // antenna
+  const pul=.6+.4*Math.sin(t*5);
+  ctx.strokeStyle=C(30);ctx.lineWidth=3.5;ctx.lineCap='round';
+  const ball=(bx,by,r)=>{ctx.fillStyle=g?'#ff4d6d':`rgba(255,183,3,${pul})`;circ(ctx,bx,by,r+2);ctx.fillStyle=g?'#ff4d6d':'#ffd166';circ(ctx,bx,by,r);};
+  if(tr.ant===0){ctx.beginPath();ctx.moveTo(0,-58);ctx.lineTo(0,-72);ctx.stroke();ball(0,-76,6);}
+  else if(tr.ant===1){for(const s of[-1,1]){ctx.beginPath();ctx.moveTo(s*14,-58);ctx.lineTo(s*20,-72);ctx.stroke();ball(s*21,-75,4.5);}}
+  else if(tr.ant===2){ctx.beginPath();ctx.moveTo(0,-58);for(let i=1;i<=6;i++)ctx.lineTo((i%2?6:-6),-58-i*3);ctx.stroke();ball(0,-80,5);}
+  else{ctx.beginPath();ctx.moveTo(0,-58);ctx.lineTo(0,-66);ctx.stroke();ctx.save();ctx.translate(0,-70);ctx.rotate(Math.sin(t*1.5)*.5);ctx.fillStyle=C(75);ctx.beginPath();ctx.arc(0,0,13,Math.PI,0);ctx.closePath();ctx.fill();ctx.fillStyle=g?'#ff4d6d':'#ffd166';circ(ctx,0,-4,3);ctx.restore();}
+  // testa
+  ctx.fillStyle=C(62);rr(ctx,-35,-58,70,48,15);
+  ctx.fillStyle='rgba(255,255,255,.14)';rr(ctx,-29,-54,24,6,3);
+  // orecchie
+  ctx.fillStyle=C(42);rr(ctx,-41,-42,8,16,3);rr(ctx,33,-42,8,16,3);
+  // schermo viso
+  ctx.fillStyle='#141833';rr(ctx,-28,-51,56,34,11);
+  const eyeC=g?'#ff4d6d':'#7df9ff';
+  const blink=(Math.sin(t*1.3)>.985)&&!g;
+  const lx=st.look||0;
+  ctx.fillStyle=eyeC;ctx.strokeStyle=eyeC;ctx.lineWidth=3;
+  if(g){
+    for(const ex of[-12,12]){ctx.beginPath();ctx.moveTo(ex-5,-41);ctx.lineTo(ex+5,-31);ctx.moveTo(ex+5,-41);ctx.lineTo(ex-5,-31);ctx.stroke();}
+  }else if(blink){
+    ctx.fillRect(-18,-36,12,3);ctx.fillRect(6,-36,12,3);
+  }else if(tr.eye===0){
+    circ(ctx,-12+lx,-36,6);circ(ctx,12+lx,-36,6);ctx.fillStyle='#fff';circ(ctx,-10+lx,-38,2);circ(ctx,14+lx,-38,2);
+  }else if(tr.eye===1){
+    circ(ctx,-12,-36,8.5);circ(ctx,12,-36,8.5);ctx.fillStyle='#141833';circ(ctx,-11+lx*1.5,-35,4);circ(ctx,13+lx*1.5,-35,4);ctx.fillStyle='#fff';circ(ctx,-9,-39,2);circ(ctx,15,-39,2);
+  }else if(tr.eye===2){
+    ctx.globalAlpha=.35;rr(ctx,-22,-41,44,10,5);ctx.globalAlpha=1;const p=Math.sin(t*2.5)*15;rr(ctx,-6+p,-41,12,10,5);
+  }else{
+    rr(ctx,-18+lx,-42,11,11,2);rr(ctx,7+lx,-42,11,11,2);
+  }
+  // bocca
+  ctx.strokeStyle=eyeC;ctx.fillStyle=eyeC;ctx.lineWidth=2.5;
+  if(g){ctx.beginPath();ctx.moveTo(-8,-23);for(let i=1;i<=4;i++)ctx.lineTo(-8+i*4,i%2?-26:-23);ctx.stroke();}
+  else if(tr.mouth===0){ctx.beginPath();ctx.arc(0,-28,6,.15*Math.PI,.85*Math.PI);ctx.stroke();}
+  else if(tr.mouth===1){rr(ctx,-8,-27,16,6,2);ctx.fillStyle='#141833';ctx.fillRect(-3,-27,1.5,6);ctx.fillRect(2,-27,1.5,6);}
+  else{ctx.beginPath();ctx.arc(0,-25,3.5,0,Math.PI*2);ctx.stroke();}
+  if(tr.cheeks&&!g){ctx.fillStyle='rgba(255,170,90,.5)';circ(ctx,-21,-26,3.5);circ(ctx,21,-26,3.5);}
+  ctx.restore();
+}
+
+/* canvas helper con devicePixelRatio */
+function fitCanvas(cv,cssW,cssH,lw,lh=lw){
+  const d=window.devicePixelRatio||1;
+  cv.style.width=cssW+'px';cv.style.height=cssH+'px';
+  cv.width=Math.round(cssW*d);cv.height=Math.round(cssH*d);
+  const ctx=cv.getContext('2d');ctx.setTransform(cv.width/lw,0,0,cv.height/lh,0,0);return ctx;
+}
+
+/* =========================================================
+   SUONI (WebAudio, minimali)
+   ========================================================= */
+let AC=null,muted=false;
+function beep(f,d=.12,type='square',vol=.06,slide=0){
+  if(muted)return;try{
+    AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+    const o=AC.createOscillator(),gn=AC.createGain();o.type=type;o.frequency.value=f;
+    if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(30,f+slide),AC.currentTime+d);
+    gn.gain.value=vol;gn.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+d);
+    o.connect(gn).connect(AC.destination);o.start();o.stop(AC.currentTime+d);
+  }catch(e){}
+}
+const sfx={
+  bit:()=>beep(700+Math.random()*500,.04,'square',.03),
+  ok:()=>{beep(660,.1,'triangle',.08);setTimeout(()=>beep(990,.15,'triangle',.08),110);},
+  bonk:()=>beep(140,.18,'square',.08,-60),
+  crash:()=>{for(let i=0;i<8;i++)setTimeout(()=>beep(80+Math.random()*900,.07,'sawtooth',.05),i*60);setTimeout(()=>beep(400,.5,'sawtooth',.06,-360),500);},
+  start:()=>beep(520,.08,'triangle',.07)
+};
+
+/* =========================================================
+   SCHERMATE
+   ========================================================= */
+const $=id=>document.getElementById(id);
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));}
+let ID=null;
+
+/* robot "teaser" nella schermata iniziale */
+let teaser={hue:205,eye:0,ant:0,mouth:0,body:0,cheeks:true,sigla:'???'};
+setInterval(()=>{teaser={hue:HUES[Math.random()*HUES.length|0],eye:Math.random()*4|0,ant:Math.random()*4|0,mouth:Math.random()*3|0,body:Math.random()*3|0,cheeks:Math.random()<.5,sigla:'???'};},1100);
+const sbCtx=fitCanvas($('startBot'),220,220,220);
+const bbCtx=fitCanvas($('bigBot'),260,260,260);
+const mbCtx=fitCanvas($('miniBot'),46,46,46);
+
+$('nameIn').addEventListener('keydown',e=>{if(e.key==='Enter')$('makeBtn').click();});
+$('makeBtn').onclick=async()=>{
+  const raw=$('nameIn').value,c=cleanName(raw);
+  if(c.replace(/ /g,'').length<2){$('nameMsg').textContent='Scrivi almeno 2 lettere 🙂';return;}
+  $('nameMsg').textContent='';$('makeBtn').disabled=true;$('makeBtn').textContent='Controllo il registro…';
+  try{
+    const reg=await fullRegistry();
+    const same=reg.filter(e=>e.name===c.toLowerCase()).sort((a,b)=>a.t-b.t);
+    if(same.length){askWho(raw,same,reg);return;}
+    await createNew(raw,reg);
+  }finally{$('makeBtn').disabled=false;$('makeBtn').textContent='Crea il mio robot ⚡';}
+};
+async function createNew(raw,reg){
+  const name=cleanName(raw).toLowerCase();
+  const usedK=new Set(reg.filter(e=>e.name===name).map(e=>e.k));
+  const fulls=new Set(reg.map(e=>e.full)),sigs=new Set(reg.map(e=>e.sig));
+  let id=null;
+  for(let k=1;k<=255;k++){if(usedK.has(k))continue;const t=makeIdentity(raw,k);if(!fulls.has(t.full)&&!sigs.has(t.sig)){id=t;break;}}
+  ID=id||makeIdentity(raw,Math.min(255,usedK.size+1));
+  await register(ID);
+  startReveal();
+}
+function askWho(raw,same,reg){
+  const nm=makeIdentity(raw).show;
+  $('whoText').innerHTML=same.length===1?`C'è già un robot per <b>${esc(nm)}</b>. Sei tu?`:`Ci sono già ${same.length} robot per <b>${esc(nm)}</b>. Uno di questi è tuo?`;
+  const L=$('whoList');L.innerHTML='';
+  for(const e of same){
+    const b=document.createElement('button');b.className='sec';b.style.textAlign='left';
+    const when=new Date(e.t).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+    b.innerHTML=`✋ Sono io: <b>${esc(e.full)}</b> <small style="color:var(--mute)">· ${esc(e.pc)} alle ${when}</small>`;
+    b.onclick=()=>{$('whoModal').classList.remove('on');ID=makeIdentity(raw,e.k);startReveal();};
+    L.appendChild(b);
+  }
+  $('whoNew').textContent=`No, sono un'altra persona di nome ${nm}`;
+  $('whoNew').onclick=async()=>{$('whoModal').classList.remove('on');await createNew(raw,reg);};
+  $('whoModal').classList.add('on');
+}
+
+const sleepPlain=ms=>new Promise(r=>setTimeout(r,ms));
+let revealToken=0;
+async function startReveal(){
+  const tok=++revealToken;
+  show('sReveal');
+  const cards=$('cards'),steps=$('steps');cards.innerHTML='';cards.classList.toggle('small',ID.bytes.length>10);steps.innerHTML='';
+  $('revealRow').classList.remove('on');$('goBtn').classList.add('hidden');$('certBtn2').classList.add('hidden');$('botInfo').innerHTML='';
+  const per=Math.max(260,Math.min(520,3600/ID.bytes.length));
+  for(const [bi,b] of ID.bytes.entries()){
+    const ser=bi>=ID.nameLen;
+    const ch=ser?`<span style="color:var(--acc)">#${b}</span>`:b===32?'<span style="color:#6b7299">␣</span>':String.fromCharCode(b);const bin=b.toString(2).padStart(8,'0');
+    const el=document.createElement('div');el.className='card';if(ser)el.style.borderColor='var(--acc)';
+    el.innerHTML=`<div class="L">${ch}</div><div class="D">${ser?"n° di serie ":b===32?"spazio · ":"numero "}${b}</div><div class="arrow">▼</div><div class="B">--------</div><div class="arrow">▼</div><div class="H"></div>`;
+    cards.appendChild(el);await sleepPlain(30);el.classList.add('on');
+    const B=el.querySelector('.B');
+    const flips=8;
+    for(let f=0;f<flips;f++){
+      if(tok!==revealToken)return;
+      const s=[...bin].map((v,i)=>i<f?v:(Math.random()<.5?'0':'1')).join('');
+      B.innerHTML=fmtBin(s);sfx.bit();await sleepPlain(per/flips*.7);
+    }
+    B.innerHTML=fmtBin(bin);
+    el.querySelector('.H').textContent=hex2(b);
+    await sleepPlain(per*.3);
+  }
+  const lines=[
+    ...(ID.serial>1?[`Esisteva già un robot uguale: aggiungo il <em>numero di serie ${ID.serial}</em> come byte in più, così il tuo robot è unico`]:[]),
+    `Il tuo nome in esadecimale: <b>${ID.bytes.map(hex2).join(' ')}</b>`,
+    `Sommo tutti i numeri: ${ID.bytes.join(' + ')} = <em>${ID.sum}</em> → in esadecimale <b>${ID.sumHex}</b>`,
+    `Sigla del robot: iniziale <b>${ID.kid[0]}</b> + ultime due cifre <b>${ID.tail}</b> = <em>${ID.sigla}</em>`,
+    `Mescolo i byte (XOR) → <b>${hex2(ID.xor)}</b>, ultima cifra <b>${(ID.xor&15).toString(16).toUpperCase()}</b> = nome n° ${ID.nickIdx} della lista → <em>${ID.nick}</em>`
+  ];
+  for(const l of lines){
+    if(tok!==revealToken)return;
+    const d=document.createElement('div');d.className='step';d.innerHTML=l;steps.appendChild(d);
+    await sleepPlain(40);d.classList.add('on');sfx.start();await sleepPlain(900);
+  }
+  const t=ID.traits;
+  $('botInfo').innerHTML=`<h3>${ID.full}</h3><div>Robot di <b>${ID.show}</b><br>Colore: <b>tonalità ${t.hue}°</b><br>${cap(EYES[t.eye])} · ${ANTS[t.ant]}<br>${cap(BODIES[t.body])} · ${MOUTHS[t.mouth]}</div>`;
+  $('revealRow').classList.add('on');sfx.ok();setTimeout(()=>speak(`Ciao ${ID.show}! Io sono ${ID.sigla.split('').join(' ')} ${ID.nick}`),500);
+  await sleepPlain(700);$('goBtn').classList.remove('hidden');$('certBtn2').classList.remove('hidden');$('goBtn').scrollIntoView({behavior:'smooth',block:'end'});
+}
+const cap=s=>s[0].toUpperCase()+s.slice(1);
+function fmtBin(s){return [...s].map(c=>c==='1'?`<u>1</u>`:`<i>0</i>`).join('');}
+
+$('goBtn').onclick=()=>{enterMain();};
+$('newKidBtn').onclick=()=>{hardStop();$('certModal').classList.remove('on');$('nameIn').value='';ID=null;show('sStart');setTimeout(()=>$('nameIn').focus(),50);};
+$('muteBtn').onclick=()=>{muted=!muted;$('muteBtn').textContent=muted?'🔇':'🔊';};
+
+/* =========================================================
+   VOCE DEL ROBOT (sintesi vocale del sistema: funziona offline)
+   ========================================================= */
+const TTS='speechSynthesis' in window&&'SpeechSynthesisUtterance' in window;
+let voiceOn=true,itVoice=null;
+function pickVoice(){
+  if(!TTS)return;const vs=speechSynthesis.getVoices().filter(v=>/^it/i.test(v.lang));
+  itVoice=vs.find(v=>v.localService)||vs[0]||null;     // prima le voci installate nel PC (offline)
+}
+if(TTS){pickVoice();speechSynthesis.onvoiceschanged=pickVoice;}
+const cleanSpeech=t=>String(t).replace(/[\p{Extended_Pictographic}\u{FE0F}\u{200D}]/gu,'').replace(/[▶■↺✅✋]/g,'').replace(/\s+/g,' ').trim();
+function robotPitch(){if(!ID)return 1.2;const t=ID.traits;return 0.75+((t.hue*3+t.eye*5+t.ant*7+t.mouth*11)%9)/10;}   // 0,75 … 1,55: ogni robot ha la sua voce
+function speak(text){
+  return new Promise(res=>{
+    const txt=cleanSpeech(text);
+    if(!TTS||!voiceOn||muted||!txt)return res();
+    let done=false;const fin=()=>{if(!done){done=true;clearTimeout(to);res();}};
+    try{
+      speechSynthesis.cancel();
+      const u=new SpeechSynthesisUtterance(txt);u.lang='it-IT';if(itVoice)u.voice=itVoice;
+      u.pitch=robotPitch();u.rate=1.05;u.volume=1;u.onend=fin;u.onerror=fin;
+      speechSynthesis.speak(u);
+    }catch(e){return res();}
+    var to=setTimeout(fin,Math.min(12000,1500+txt.length*110));   // paracadute: se la voce non risponde il programma non si blocca
+  });
+}
+function stopSpeech(){try{if(TTS)speechSynthesis.cancel();}catch(e){}}
+$('voiceBtn').onclick=()=>{voiceOn=!voiceOn;$('voiceBtn').textContent=voiceOn?'🗣 Voce':'🤐 Voce';$('voiceBtn').style.opacity=voiceOn?1:.6;if(!voiceOn)stopSpeech();};
+if(!TTS){$('voiceBtn').classList.add('hidden');}
+
+/* =========================================================
+   EDITOR
+   ========================================================= */
+const ta=$('code'),hl=$('hl'),gut=$('gutter');
+const LH=22,PAD=12;
+const KW=['ripeti','volte','finché','finche','mentre','per','sempre','se','altrimenti','e','o','non'];
+const CMDS={
+  avanti:{n:1,ex:'100'},indietro:{n:1,ex:'50'},destra:{n:1,ex:'90'},sinistra:{n:1,ex:'90'},
+  gira_destra:{n:1,ex:'90'},gira_sinistra:{n:1,ex:'90'},attendi:{n:1,ex:'1'},colore:{n:1,ex:'"rosso"'},
+  spessore:{n:1,ex:'6'},penna_su:{n:0,ex:''},penna_giu:{n:0,ex:''},di:{n:1,ex:'"ciao"'},centro:{n:0,ex:''},cancella:{n:0,ex:''}
+};
+const FUNCS={casuale:2,arrotonda:1};
+const COLORS={rosso:'#ff3b3b',arancione:'#ff8c1a',giallo:'#f5c400',verde:'#1fbf6a',azzurro:'#2bb7f0',blu:'#3a56e8',viola:'#8b4fd6',rosa:'#f04aa8',nero:'#1b1b2f',marrone:'#8b5a2b',grigio:'#8a8fa3',oro:'#d4a017',arcobaleno:'rainbow'};
+
+let ORIGINAL='';
+function defaultCode(){
+  return `# Ciao ${ID.show}! Io sono ${ID.full} 🤖
+# Cambia i numeri, poi premi ▶ Esegui
+
+# ══ 1 · VARIABILI ══ i numeri che puoi cambiare
+velocita = 5        # da 1 a 20
+lato = 120
+angolo = 90
+
+# ══ 2 · PENNA ══ come disegna il robot
+colore("arancione")
+spessore(6)
+
+# ══ 3 · OUTPUT ══ il robot scrive sullo schermo
+di("Ciao ${ID.show}! Disegno un quadrato")
+
+# ══ 4 · CICLO ══ le istruzioni che si ripetono
+ripeti 4 volte:
+    avanti(lato)
+    destra(angolo)
+    attendi(0.2)
+
+# ══ 5 · FINE ══ il saluto finale
+di("Fatto! Ora tocca a te")
+`;}
+
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function hlLine(s){
+  const sm=/^(\s*)(#\s*══\s*(\d).*)$/.exec(s);
+  if(sm)return `${sm[1]}<span class="t-sec c${sm[3]}">${esc(sm[2])}</span>`;
+  let out='',m;const re=/(#.*$)|("[^"]*"?|'[^']*'?)|(\d+(?:\.\d+)?)|([A-Za-zÀ-ÿ_][A-Za-z0-9À-ÿ_]*)|([\s\S])/g;
+  while((m=re.exec(s))){
+    if(m[1])out+=`<span class="t-c">${esc(m[1])}</span>`;
+    else if(m[2])out+=`<span class="t-s">${esc(m[2])}</span>`;
+    else if(m[3])out+=`<span class="t-n">${m[3]}</span>`;
+    else if(m[4]){const w=m[4];out+=KW.includes(w)?`<span class="t-k">${w}</span>`:(CMDS[w]||FUNCS[w])?`<span class="t-f">${w}</span>`:`<span class="t-v">${w}</span>`;}
+    else out+=esc(m[5]);
+  }
+  return out;
+}
+const GLY='#@$%&*!?01▓▒░█<>/\\|{}[]~^';
+function corruptLine(s,p){return '<span class="t-x">'+esc([...s].map(c=>c===' '?(Math.random()<p*.3?GLY[Math.random()*GLY.length|0]:' '):(Math.random()<p?GLY[Math.random()*GLY.length|0]:c)).join(''))+'</span>';}
+
+let corruptFn=null,curLine=0,errLineN=0;
+function renderEditor(){
+  const lines=ta.value.split('\n');
+  hl.innerHTML=lines.map((l,i)=>corruptFn?corruptFn(l,i):hlLine(l)).join('\n')+'\n ';
+  gut.innerHTML=lines.map((_,i)=>`<div class="${i+1===errLineN?'bad':i+1===curLine?'cur':''}">${i+1}</div>`).join('');
+  syncScroll();
+}
+function syncScroll(){
+  hl.style.transform=`translate(${-ta.scrollLeft}px,${-ta.scrollTop}px)`;
+  gut.style.transform=`translateY(${-ta.scrollTop}px)`;
+  placeLine($('activeLine'),curLine);placeLine($('errLine'),errLineN);
+}
+function placeLine(el,n){if(!n){el.style.display='none';return;}el.style.display='block';el.style.top=(PAD+(n-1)*LH-ta.scrollTop)+'px';}
+function setLine(n){
+  if(n===curLine)return;curLine=n;
+  gut.querySelectorAll('div').forEach((d,i)=>{d.classList.toggle('cur',i+1===n&&i+1!==errLineN);});
+  placeLine($('activeLine'),n);
+  if(n){const top=PAD+(n-1)*LH;if(top<ta.scrollTop)ta.scrollTop=top-PAD;else if(top+LH>ta.scrollTop+ta.clientHeight)ta.scrollTop=top+LH-ta.clientHeight+PAD;}
+}
+ta.addEventListener('input',()=>{if(errLineN){clearError();}renderEditor();});
+ta.addEventListener('scroll',syncScroll);
+function insertText(txt){if(!document.execCommand('insertText',false,txt)){ta.setRangeText(txt,ta.selectionStart,ta.selectionEnd,'end');ta.dispatchEvent(new Event('input'));}}
+ta.addEventListener('keydown',e=>{
+  if(ta.readOnly)return;
+  if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();run();return;}
+  if(e.key==='Tab'){e.preventDefault();insertText('    ');return;}
+  if(e.key==='Enter'){
+    const st=ta.selectionStart,before=ta.value.slice(0,st);const ls=before.lastIndexOf('\n')+1;const line=before.slice(ls);
+    let ind=line.match(/^ */)[0].length;if(/:\s*(#.*)?$/.test(line.replace(/#.*$/,'').trimEnd()+'')||line.replace(/#.*$/,'').trimEnd().endsWith(':'))ind+=4;
+    e.preventDefault();insertText('\n'+' '.repeat(ind));return;
+  }
+  if(e.key==='Backspace'&&ta.selectionStart===ta.selectionEnd){
+    const st=ta.selectionStart,before=ta.value.slice(0,st);const ls=before.lastIndexOf('\n')+1;const line=before.slice(ls);
+    if(line.length>=4&&/^ +$/.test(line)&&line.length%4===0){e.preventDefault();ta.setSelectionRange(st-4,st);insertText('');}
+  }
+});
+
+/* =========================================================
+   PARSER  (pseudo-Python in italiano)
+   ========================================================= */
+class CodeErr{constructor(line,msg,hint){this.line=line;this.msg=msg;this.hint=hint||'';this.isCodeErr=true;}}
+const E=(line,msg,hint)=>{throw new CodeErr(line,msg,hint);};
+
+function lev(a,b){const m=a.length,n=b.length,d=Array.from({length:m+1},(_,i)=>[i]);for(let j=1;j<=n;j++)d[0][j]=j;for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return d[m][n];}
+function suggest(w,list){let best=null,bd=99;const wl=w.toLowerCase();for(const c of list){const d=lev(wl,c.toLowerCase());if(d<bd){bd=d;best=c;}}return bd<=(w.length<=4?1:2)?best:null;}
+
+const NAME_RE=/^[A-Za-zÀ-ÿ_][A-Za-z0-9À-ÿ_]*/;
+function tokenize(src,line){
+  const T=[];let i=0;
+  while(i<src.length){
+    const c=src[i],rest=src.slice(i);let m;
+    if(/\s/.test(c)){i++;continue;}
+    if((m=/^(\d+\.\d+|\d+|\.\d+)/.exec(rest))){
+      if(/^\d+,\d+/.test(rest)&&false){}
+      T.push({t:'num',v:parseFloat(m[1])});i+=m[1].length;continue;}
+    if(c==='"'||c==="'"){const j=src.indexOf(c,i+1);if(j<0)E(line,`Hai aperto le virgolette ${c} ma non le hai chiuse.`,`Aggiungi ${c} alla fine del testo, per esempio: di("ciao")`);T.push({t:'str',v:src.slice(i+1,j)});i=j+1;continue;}
+    if((m=NAME_RE.exec(rest))){T.push({t:'name',v:m[0]});i+=m[0].length;continue;}
+    const two=src.substr(i,2);
+    if(['<=','>=','==','!='].includes(two)){T.push({t:'op',v:two});i+=2;continue;}
+    if('<>+-*/%(),'.includes(c)){T.push({t:'op',v:c});i++;continue;}
+    if(c==='=')E(line,'Per confrontare due cose si usa == (due segni uguale).','Esempio: se lato == 100:');
+    if(c===':')E(line,'Il segno : va solo alla fine della riga.');
+    if(c==='×'||c==='x'&&false){}
+    E(line,`Non capisco il simbolo "${c}".`,'Per moltiplicare usa *, per dividere /');
+  }
+  return T;
+}
+function PE(src,line){
+  const T=tokenize(src,line);let p=0;
+  const peek=()=>T[p],isOp=v=>T[p]&&T[p].t==='op'&&T[p].v===v;
+  const isW=v=>T[p]&&T[p].t==='name'&&T[p].v===v;
+  function or(){let a=and();while(isW('o')){p++;a={t:'bin',op:'o',a,b:and()};}return a;}
+  function and(){let a=not();while(isW('e')){p++;a={t:'bin',op:'e',a,b:not()};}return a;}
+  function not(){if(isW('non')){p++;return{t:'not',a:not()};}return cmp();}
+  function cmp(){let a=add();while(T[p]&&T[p].t==='op'&&['<','>','<=','>=','==','!='].includes(T[p].v)){const op=T[p++].v;a={t:'bin',op,a,b:add()};}return a;}
+  function add(){let a=mul();while(isOp('+')||isOp('-')){const op=T[p++].v;a={t:'bin',op,a,b:mul()};}return a;}
+  function mul(){let a=un();while(isOp('*')||isOp('/')||isOp('%')){const op=T[p++].v;a={t:'bin',op,a,b:un()};}return a;}
+  function un(){if(isOp('-')){p++;return{t:'neg',a:un()};}if(isOp('+')){p++;return un();}return prim();}
+  function prim(){
+    const k=peek();
+    if(!k)E(line,'La riga sembra incompleta: manca qualcosa alla fine.');
+    if(k.t==='num'){p++;return{t:'num',v:k.v};}
+    if(k.t==='str'){p++;return{t:'str',v:k.v};}
+    if(k.t==='name'){
+      p++;
+      if(isOp('(')){p++;const args=[];
+        if(!isOp(')')){args.push(or());while(isOp(',')){p++;args.push(or());}}
+        if(!isOp(')'))E(line,'Manca una parentesi chiusa ).',`Controlla che ogni ( abbia la sua ).`);
+        p++;return{t:'call',name:k.v,args};}
+      return{t:'name',v:k.v};
+    }
+    if(k.t==='op'&&k.v==='('){p++;const e=or();if(!isOp(')'))E(line,'Manca una parentesi chiusa ).');p++;return e;}
+    if(k.t==='op'&&k.v===')')E(line,'C\'è una parentesi ) di troppo.');
+    if(k.t==='op'&&k.v===',')E(line,'C\'è una virgola fuori posto.','Per i numeri con la virgola usa il punto: 0.5');
+    E(line,`Il segno "${k.v}" è fuori posto.`);
+  }
+  const r=or();
+  if(p<T.length){
+    const k=T[p];
+    if(k.t==='op'&&k.v===',')E(line,'C\'è una virgola fuori posto.','Per i numeri con la virgola usa il punto: 0.5 (non 0,5)');
+    if(k.t==='op'&&k.v===')')E(line,'C\'è una parentesi ) di troppo.');
+    E(line,`C'è qualcosa di troppo: "${k.v}".`,'Forse manca un segno come + o *, oppure c\'è una parola in più.');
+  }
+  return r;
+}
+
+function parseStmt(text,line){
+  const endsColon=text.endsWith(':');
+  const body=endsColon?text.slice(0,-1).trim():text;
+  const first=(text.match(NAME_RE)||[''])[0];const fl=first.toLowerCase();
+  const needColon=ex=>{if(!endsColon)E(line,'Manca il segno : (due punti) alla fine della riga.',`Scrivi così: ${ex}`);};
+  if(fl==='ripeti'){
+    needColon('ripeti 4 volte:');
+    let rest=body.slice(first.length).trim();
+    if(!/(^|\s)volte$/i.test(rest))E(line,'Dopo "ripeti" devi scrivere quante volte.','Esempio: ripeti 4 volte:');
+    rest=rest.replace(/volte$/i,'').trim();
+    if(!rest)E(line,'Quante volte? Manca il numero.','Esempio: ripeti 4 volte:');
+    return{type:'repeat',expr:PE(rest,line),line,block:true};
+  }
+  if(fl==='per'){
+    if(/^per\s+sempre$/i.test(body)){needColon('per sempre:');return{type:'forever',line,block:true};}
+    E(line,'Forse volevi scrivere: per sempre:');
+  }
+  if(['finché','finche','mentre'].includes(fl)){
+    needColon('finché lato < 200:');const c=body.slice(first.length).trim();
+    if(!c)E(line,'Manca la condizione dopo "finché".','Esempio: finché lato < 200:');
+    return{type:'while',expr:PE(c,line),line,block:true};
+  }
+  if(fl==='se'){
+    needColon('se lato > 100:');const c=body.slice(first.length).trim();
+    if(!c)E(line,'Manca la condizione dopo "se".','Esempio: se lato > 100:');
+    return{type:'if',expr:PE(c,line),line,block:true};
+  }
+  if(fl==='altrimenti'){
+    if(body.toLowerCase()!=='altrimenti')E(line,'Dopo "altrimenti" non va scritto niente, solo i due punti.','Scrivi: altrimenti:');
+    needColon('altrimenti:');return{type:'else',line,block:true};
+  }
+  if(endsColon)E(line,'I due punti : vanno solo dopo ripeti, finché, per sempre, se, altrimenti.','Togli i due punti alla fine di questa riga.');
+  const m=text.match(/^([A-Za-zÀ-ÿ_][A-Za-z0-9À-ÿ_]*)\s*=(?!=)(.*)$/);
+  if(m){
+    const nm=m[1];
+    if(CMDS[nm]||FUNCS[nm]||KW.includes(nm))E(line,`"${nm}" è una parola del linguaggio: non puoi usarla come nome di variabile.`,'Scegli un altro nome, per esempio: lato = 100');
+    const ex=m[2].trim();if(!ex)E(line,'Dopo il segno = devi scrivere un valore.',`Esempio: ${nm} = 100`);
+    return{type:'assign',name:nm,expr:PE(ex,line),line};
+  }
+  if(!first)E(line,'Questa riga non inizia con un comando.','Le righe devono iniziare con un comando, per esempio: avanti(100)');
+  if(!CMDS[first]){
+    if(FUNCS[first])E(line,`${first}() dà un numero: va messo in una variabile.`,`Esempio: lato = ${first}(50, 150)`);
+    if(KW.includes(fl))E(line,`La parola "${first}" qui non va bene.`);
+    const s=suggest(first,[...Object.keys(CMDS),'ripeti','finché','per','se','altrimenti']);
+    const rest=text.slice(first.length).trim();
+    if(/^[A-Za-zÀ-ÿ_]/.test(rest)&&!s)E(line,`Non capisco "${first} ${rest.split(/\s/)[0]}".`,'Per creare una variabile si usa il segno =, per esempio: lato = 100');
+    E(line,`Non conosco il comando "${first}".`,s?`Forse volevi scrivere: <code>${s}</code>`:'Guarda la scheda 📖 Comandi per l\'elenco.');
+  }
+  const node=PE(text,line);
+  const ex=`${first}(${CMDS[first].ex})`;
+  if(node.t==='name')E(line,'Ai comandi servono le parentesi ( ).',`Scrivi: <code>${ex}</code>`);
+  if(node.t!=='call'||node.name!==first)E(line,'Questa riga non è scritta bene.',`Esempio: <code>${ex}</code>`);
+  const want=CMDS[first].n;
+  if(node.args.length!==want)E(line,want===0?`${first}() non vuole niente tra le parentesi.`:`${first} vuole ${want===1?'un valore':want+' valori'} tra le parentesi.`,`Esempio: <code>${ex}</code>`);
+  return{type:'cmd',name:first,args:node.args,line};
+}
+function stripComment(s){let q=null;for(let i=0;i<s.length;i++){const c=s[i];if(q){if(c===q)q=null;}else if(c==='"'||c==="'")q=c;else if(c==='#')return s.slice(0,i);}return s;}
+function parseProgram(src){
+  const L=[];
+  src.replace(/\t/g,'    ').split('\n').forEach((s,i)=>{const t=stripComment(s).replace(/\s+$/,'');if(!t.trim())return;L.push({ind:t.match(/^ */)[0].length,text:t.trim(),line:i+1});});
+  let p=0;
+  function block(ind){
+    const out=[];
+    while(p<L.length){
+      const l=L[p];
+      if(l.ind<ind)break;
+      if(l.ind>ind)E(l.line,out.length===0&&ind===0?'La prima istruzione non deve essere spostata a destra.':'Questa riga è spostata a destra, ma non è dentro un ciclo (oppure non è allineata).','Le righe si spostano a destra solo sotto ripeti / finché / per sempre / se. Controlla gli spazi all\'inizio.');
+      p++;
+      const s=parseStmt(l.text,l.line);
+      if(s.block){
+        const nx=L[p];
+        if(!nx||nx.ind<=ind)E(l.line,'Dopo i due punti : manca il blocco di istruzioni.','Scrivi le istruzioni nella riga sotto, spostate a destra con il tasto Tab.');
+        s.body=block(nx.ind);
+      }
+      if(s.type==='else'){const pr=out[out.length-1];if(!pr||pr.type!=='if'||pr.els)E(l.line,'"altrimenti" deve venire subito dopo un blocco "se".');pr.els=s.body;continue;}
+      out.push(s);
+    }
+    return out;
+  }
+  return block(0);
+}
+
+/* =========================================================
+   ARENA
+   ========================================================= */
+const W=600,BOUND=18;
+const arena=$('arena');let actx;
+const trail=document.createElement('canvas');trail.width=trail.height=1200;
+const tctx=trail.getContext('2d');tctx.setTransform(2,0,0,2,0,0);tctx.lineCap='round';tctx.lineJoin='round';
+const R={x:300,y:300,h:0,pen:true,color:'#ff8c1a',rainbow:false,width:6,dist:0,moving:false,glitch:0,say:'',sayUntil:0,look:0};
+let sparks=[];
+function resetRobot(){Object.assign(R,{x:300,y:300,h:0,pen:true,color:'#ff8c1a',rainbow:false,width:6,dist:0,moving:false,glitch:0,say:'',sayUntil:0});}
+let trailInk=false;
+function clearTrail(){tctx.clearRect(0,0,W,W);trailInk=false;}
+function resizeArena(){
+  const wr=$('arenaWrap');const s=Math.max(200,Math.floor(Math.min(wr.clientWidth,wr.clientHeight)-20));
+  actx=fitCanvas(arena,s,s,W);
+}
+new ResizeObserver(resizeArena).observe($('arenaWrap'));
+
+function say(txt,ms=2600){R.say=txt;R.sayUntil=performance.now()+ms;}
+function drawBubble(ctx,now){
+  if(!R.say||now>R.sayUntil)return;
+  let txt=R.say;
+  if(R.glitch)txt=[...txt].map(c=>Math.random()<.25?GLY[Math.random()*GLY.length|0]:c).join('');
+  ctx.font='600 22px Fredoka,sans-serif';
+  const words=txt.split(' ');const lines=[];let cur='';
+  for(const w of words){const t=cur?cur+' '+w:w;if(ctx.measureText(t).width>260&&cur){lines.push(cur);cur=w;}else cur=t;}
+  if(cur)lines.push(cur);
+  const bw=Math.min(300,Math.max(...lines.map(l=>ctx.measureText(l).width))+24),bh=lines.length*27+16;
+  let bx=R.x-bw/2,by=R.y-62-bh-14;
+  if(by<6)by=R.y+60;bx=Math.max(6,Math.min(W-bw-6,bx));
+  ctx.fillStyle=R.glitch?'#2a0f1d':'#fff';ctx.strokeStyle=R.glitch?'#ff4d6d':'#2c3368';ctx.lineWidth=2.5;
+  ctx.beginPath();ctx.roundRect?ctx.roundRect(bx,by,bw,bh,12):ctx.rect(bx,by,bw,bh);ctx.fill();ctx.stroke();
+  ctx.fillStyle=R.glitch?'#ff4d6d':'#1b1f45';ctx.textAlign='center';ctx.textBaseline='top';
+  lines.forEach((l,i)=>ctx.fillText(l,bx+bw/2,by+9+i*27));
+}
+function drawArena(now){
+  const ctx=actx;if(!ctx)return;
+  ctx.fillStyle='#f7f4ec';ctx.fillRect(0,0,W,W);
+  ctx.strokeStyle='#e3e6f3';ctx.lineWidth=1;
+  for(let i=0;i<=W;i+=30){ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i,W);ctx.moveTo(0,i);ctx.lineTo(W,i);ctx.stroke();}
+  ctx.strokeStyle='#cdd2ea';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(300,0);ctx.lineTo(300,W);ctx.moveTo(0,300);ctx.lineTo(W,300);ctx.stroke();
+  ctx.drawImage(trail,0,0,W,W);
+  // indicatore direzione
+  if(ID){
+    const a=R.h*Math.PI/180,dx=Math.sin(a),dy=-Math.cos(a),px=R.x+dx*52,py=R.y+dy*52;
+    ctx.save();ctx.translate(px,py);ctx.rotate(a);ctx.fillStyle=R.glitch?'#ff4d6d':`hsl(${ID.traits.hue},75%,45%)`;
+    ctx.beginPath();ctx.moveTo(0,-10);ctx.lineTo(9,6);ctx.lineTo(-9,6);ctx.closePath();ctx.fill();ctx.restore();
+    // punta penna
+    ctx.fillStyle=R.pen?(R.rainbow?`hsl(${R.dist%360},90%,55%)`:R.color):'#bbb';
+    drawRobot(ctx,R.x,R.y-6,74,ID.traits,{t:now/1000,glitch:R.glitch,moving:R.moving,look:R.look});
+  }
+  // scintille
+  sparks=sparks.filter(s=>s.life>0);
+  for(const s of sparks){s.x+=s.vx;s.y+=s.vy;s.vy+=.25;s.life-=1;ctx.fillStyle=`hsla(${s.h},100%,60%,${s.life/40})`;ctx.fillRect(s.x,s.y,4,4);}
+  if(R.glitch&&Math.random()<.3)for(let i=0;i<3;i++)sparks.push({x:R.x+(Math.random()-.5)*50,y:R.y-20+(Math.random()-.5)*50,vx:(Math.random()-.5)*4,vy:-Math.random()*3,life:30,h:Math.random()<.5?350:50});
+  if(R.glitch){ // scanline glitch
+    for(let i=0;i<2;i++){const y=Math.random()*W;ctx.fillStyle='rgba(255,0,76,.08)';ctx.fillRect(0,y,W,3+Math.random()*8);}
+  }
+  drawBubble(ctx,now);
+}
+
+/* =========================================================
+   OSCILLOSCOPIO: codice → byte → bit → impulsi elettrici
+   ========================================================= */
+const OPC={avanti:1,indietro:2,destra:3,gira_destra:3,sinistra:4,gira_sinistra:4,attendi:5,colore:6,spessore:7,penna_su:8,penna_giu:9,di:10,centro:11,cancella:12};
+let SCW=600,SCH=120;const NS=300,SPB=5;
+const scopeCv=$('scope');let sctx=null;
+const CH={data:new Array(NS).fill(0),ma:new Array(NS).fill(0),mb:new Array(NS).fill(0)};
+let bitQ=[],bitHold=0,pwm=0,noise=0;
+const MOT={a:0,b:0};
+function resizeScope(){const a=$('scopeArea'),w=a.clientWidth,h=a.clientHeight;if(w>50&&h>50){SCW=w;SCH=h;sctx=fitCanvas(scopeCv,w,h,w,h);}}
+new ResizeObserver(resizeScope).observe($('scopeArea'));
+function valBytes(v){
+  if(typeof v==='string')return [...v.slice(0,3)].map(c=>c.charCodeAt(0)&255);
+  if(typeof v==='boolean')return [v?1:0];
+  const n=Math.min(65535,Math.round(Math.abs(v)));
+  return n>255?[n>>8,n&255]:[n];
+}
+function emitSignal(label,bytes){
+  $('sigCmd').textContent=label;
+  $('sigArr').textContent='→';$('sigArr2').textContent='→';
+  $('sigHex').textContent=bytes.map(hex2).join(' ');
+  $('sigBin').textContent=bytes.map(b=>b.toString(2).padStart(8,'0')).join(' ');
+  const bits=bytes.flatMap(b=>[...b.toString(2).padStart(8,'0')].map(Number));
+  bitQ.push(0,...bits,0,0);
+  if(bitQ.length>80)bitQ=bitQ.slice(-80);
+}
+function scopeTick(){
+  for(let k=0;k<2;k++){
+    let d=0;
+    if(bitQ.length){d=bitQ[0];if(++bitHold>=SPB){bitQ.shift();bitHold=0;}}
+    pwm=(pwm+1)%10;
+    const pw=m=>m===0?0:(pwm<Math.max(1,Math.round(10*Math.abs(m)))?Math.sign(m):0);
+    let a=pw(MOT.a),b=pw(MOT.b);
+    if(noise>0){d=Math.random()<.5?1:0;a=(Math.random()*2-1);b=(Math.random()*2-1);}
+    CH.data.push(d);CH.ma.push(a);CH.mb.push(b);
+    CH.data.shift();CH.ma.shift();CH.mb.shift();
+  }
+  if(noise>0)noise--;
+}
+function drawScope(){
+  if(!sctx)return;const c=sctx;
+  c.fillStyle='#070918';c.fillRect(0,0,SCW,SCH);
+  const LX=SCH>200?Math.max(130,SCW*.14):92,rows=[
+    {k:'data',name:'DATI',col:'#7df9ff',bip:false},
+    {k:'ma',name:'MOTORE A',col:'#ffb703',bip:true},
+    {k:'mb',name:'MOTORE B',col:'#38d996',bip:true}];
+  const rh=SCH/3;
+  c.strokeStyle='#161b3d';c.lineWidth=1;
+  for(let x=LX;x<SCW;x+=25){c.beginPath();c.moveTo(x,0);c.lineTo(x,SCH);c.stroke();}
+  rows.forEach((r,i)=>{
+    const top=i*rh,mid=top+rh/2,amp=rh*0.36;
+    const base=r.bip?mid:top+rh*0.82, hi=r.bip?amp:rh*0.62;
+    c.strokeStyle='#232a5c';c.beginPath();c.moveTo(LX,base);c.lineTo(SCW,base);c.stroke();
+    c.fillStyle=r.col;c.font=`700 ${SCH>200?16:12}px Fredoka,sans-serif`;c.textAlign='left';c.textBaseline='middle';c.fillText(r.name,6,mid-6);
+    c.fillStyle='#5d6496';c.font=`500 ${SCH>200?13:10}px "JetBrains Mono",monospace`;
+    c.fillText(r.bip?'+3,3V / −3,3V':'3,3V / 0V',6,mid+8);
+    const arr=CH[r.k],dx=(SCW-LX)/NS;
+    c.strokeStyle=noise>0?'#ff4d6d':r.col;c.lineWidth=SCH>200?3:2;c.shadowColor=c.strokeStyle;c.shadowBlur=6;
+    c.beginPath();
+    for(let j=0;j<NS;j++){
+      const y=base-arr[j]*hi,x=LX+j*dx;
+      if(j===0)c.moveTo(x,y);else{c.lineTo(x,base-arr[j-1]*hi);c.lineTo(x,y);}
+    }
+    c.lineTo(SCW,base-arr[NS-1]*hi);c.stroke();c.shadowBlur=0;
+  });
+}
+
+/* loop di rendering unico per tutti i canvas */
+function frame(now){
+  const t=now/1000;
+  if($('sStart').classList.contains('on')){sbCtx.clearRect(0,0,220,220);drawRobot(sbCtx,110,128,190,teaser,{t});}
+  if($('sReveal').classList.contains('on')&&ID){bbCtx.clearRect(0,0,260,260);drawRobot(bbCtx,130,150,225,ID.traits,{t});}
+  if($('sMain').classList.contains('on')&&ID){mbCtx.clearRect(0,0,46,46);drawRobot(mbCtx,23,26,40,ID.traits,{t,glitch:R.glitch});drawArena(now);scopeTick();if(curView==='vDentro'){drawScope();m2Ctx.clearRect(0,0,170,170);m2Ctx.drawImage(arena,0,0,170,170);}if(curView==='vConsole'){m1Ctx.clearRect(0,0,190,190);m1Ctx.drawImage(arena,0,0,190,190);updBot();}}
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+/* =========================================================
+   ESECUZIONE
+   ========================================================= */
+let running=false,stopFlag=false,vars={};
+const STOP={stop:true};
+const waiters=new Set();
+function sleep(ms){return new Promise((res,rej)=>{if(stopFlag)return rej(STOP);const o={rej};o.id=setTimeout(()=>{waiters.delete(o);res();},ms);waiters.add(o);});}
+function animate(dur,fn){
+  return new Promise((res,rej)=>{
+    if(stopFlag)return rej(STOP);
+    if(dur<=0){fn(1);return res();}
+    const t0=performance.now();const o={rej,raf:0};waiters.add(o);
+    const step=now=>{if(stopFlag){waiters.delete(o);return;}const p=Math.min(1,(now-t0)/(dur*1000));fn(p);if(p<1)o.raf=requestAnimationFrame(step);else{waiters.delete(o);res();}};
+    o.raf=requestAnimationFrame(step);
+  });
+}
+function hardStop(){stopSpeech();stopFlag=true;for(const o of waiters){clearTimeout(o.id);if(o.raf)cancelAnimationFrame(o.raf);o.rej(STOP);}waiters.clear();}
+
+function speed(line){
+  let v=vars.velocita??vars['velocità'];
+  if(v===undefined)return 5;
+  if(typeof v!=='number')E(line,'La variabile velocita deve essere un numero.','Esempio: velocita = 5');
+  return Math.max(1,Math.min(20,v));
+}
+const num=(v,line,what='Qui')=>{if(typeof v!=='number'||!isFinite(v))E(line,`${what} serve un numero, ma c'è un testo.`,'I numeri si scrivono senza virgolette: avanti(100)');return v;};
+
+function ev(n,line){
+  switch(n.t){
+    case 'num':case 'str':return n.v;
+    case 'name':{
+      if(n.v in vars)return vars[n.v];
+      if(n.v==='velocita'||n.v==='velocità')return 5;
+      if(COLORS[n.v])E(line,`Non conosco la variabile "${n.v}".`,`Se è un colore va tra virgolette: <code>colore("${n.v}")</code>`);
+      const s=suggest(n.v,Object.keys(vars));
+      E(line,`Non conosco la variabile "${n.v}".`,s?`Forse volevi scrivere: <code>${s}</code>`:`Prima devi crearla, per esempio: <code>${n.v} = 10</code>`);
+    }
+    case 'neg':return -num(ev(n.a,line),line);
+    case 'not':return !ev(n.a,line);
+    case 'call':{
+      if(CMDS[n.name])E(line,`${n.name}() è un comando: non dà un numero.`,'I comandi vanno da soli su una riga.');
+      if(!(n.name in FUNCS)){const s=suggest(n.name,Object.keys(FUNCS));E(line,`Non conosco "${n.name}()".`,s?`Forse volevi: <code>${s}</code>`:'');}
+      if(n.args.length!==FUNCS[n.name])E(line,`${n.name} vuole ${FUNCS[n.name]} valori tra le parentesi.`,n.name==='casuale'?'Esempio: casuale(1, 10)':'Esempio: arrotonda(3.7)');
+      const a=n.args.map(x=>num(ev(x,line),line));
+      if(n.name==='casuale'){const lo=Math.ceil(Math.min(a[0],a[1])),hi=Math.floor(Math.max(a[0],a[1]));return lo+Math.floor(Math.random()*(hi-lo+1));}
+      return Math.round(a[0]);
+    }
+    case 'bin':{
+      if(n.op==='e')return ev(n.a,line)&&ev(n.b,line);
+      if(n.op==='o')return ev(n.a,line)||ev(n.b,line);
+      const a=ev(n.a,line),b=ev(n.b,line);
+      switch(n.op){
+        case '+':if(typeof a==='string'||typeof b==='string')return String(fmt(a))+String(fmt(b));return a+b;
+        case '-':return num(a,line)-num(b,line);
+        case '*':return num(a,line)*num(b,line);
+        case '/':if(num(b,line)===0)E(line,'Non si può dividere per zero! 🤯','Neanche un supercomputer ci riesce.');return num(a,line)/b;
+        case '%':if(num(b,line)===0)E(line,'Non si può dividere per zero! 🤯');return num(a,line)%b;
+        case '<':return a<b;case '>':return a>b;case '<=':return a<=b;case '>=':return a>=b;
+        case '==':return a===b;case '!=':return a!==b;
+      }
+    }
+  }
+}
+const fmt=v=>typeof v==='number'?(Number.isInteger(v)?v:+v.toFixed(2)):v;
+
+async function move(d,line){
+  const v=speed(line);if(POLY)POLY.moves.push(Math.abs(d));
+  const a=R.h*Math.PI/180,sg=Math.sign(d)||1,dx=Math.sin(a)*sg,dy=-Math.cos(a)*sg;
+  let len=Math.abs(d),max=len;
+  const lim=(p,c)=>c>1e-9?(W-BOUND-p)/c:c<-1e-9?(BOUND-p)/c:Infinity;
+  max=Math.min(max,lim(R.x,dx),lim(R.y,dy));max=Math.max(0,max);
+  const bonk=max<len-.5;len=max;
+  const x0=R.x,y0=R.y,d0=R.dist;let lx=x0,ly=y0;
+  R.moving=true;MOT.a=MOT.b=sg*v/20;
+  try{
+  await animate(v>=20?0:len/(v*45),p=>{
+    const nx=x0+dx*len*p,ny=y0+dy*len*p;
+    if(R.pen){
+      tctx.strokeStyle=R.rainbow?`hsl(${(d0+len*p)%360},90%,55%)`:R.color;tctx.lineWidth=R.width;
+      tctx.beginPath();tctx.moveTo(lx,ly);tctx.lineTo(nx,ny);tctx.stroke();if(len>0)trailInk=true;
+    }
+    lx=nx;ly=ny;R.x=nx;R.y=ny;R.dist=d0+len*p;
+  });
+  }finally{R.moving=false;MOT.a=MOT.b=0;}
+  if(bonk){if(POLY)POLY.bonk=true;say('Bonk! Un muro! 🧱',1500);sfx.bonk();for(let i=0;i<10;i++)sparks.push({x:R.x+dx*30,y:R.y+dy*30,vx:(Math.random()-.5)*5,vy:-Math.random()*4,life:25,h:40});}
+}
+async function turn(g,line){
+  const v=speed(line),h0=R.h;if(POLY)POLY.turn+=g;R.look=Math.sign(g)*3;
+  MOT.a=Math.sign(g)*v/20;MOT.b=-Math.sign(g)*v/20;
+  try{await animate(v>=20?0:Math.abs(g)/(v*80),p=>{R.h=h0+g*p;});}
+  finally{R.look=0;MOT.a=MOT.b=0;}
+}
+async function cmd(s){
+  const line=s.line,a=s.args.map(x=>ev(x,line));
+  {const src=`${s.name}(${s.args.map(x=>exStr(x,false)).join(', ')})`,val=`${s.name}(${a.map(fmtV).join(', ')})`;
+   clog(line,`<b>${H(src)}</b>${src!==val?` → <span class="vv">${H(val)}</span>`:''}  <span class="ex">${explainCmd(s.name,a)}</span>`,s.name==='di'?'out':'');}
+  emitSignal(`${s.name}(${a.map(v=>typeof v==='string'?`"${v}"`:fmt(v)).join(', ')})`,[OPC[s.name],...a.flatMap(valBytes)]);
+  switch(s.name){
+    case 'avanti':return move(num(a[0],line),line);
+    case 'indietro':return move(-num(a[0],line),line);
+    case 'destra':case 'gira_destra':return turn(num(a[0],line),line);
+    case 'sinistra':case 'gira_sinistra':return turn(-num(a[0],line),line);
+    case 'attendi':{const t=num(a[0],line);if(t<0)E(line,'Non si può aspettare un tempo negativo!','Usa un numero da 0 a 10.');if(t>10)E(line,'Massimo 10 secondi, se no il robot si addormenta! 😴','Usa un numero da 0 a 10.');return sleep(t*1000);}
+    case 'colore':{
+      if(typeof a[0]!=='string')E(line,'Il colore va scritto tra virgolette.','Esempio: <code>colore("rosso")</code>');
+      const c=a[0].toLowerCase().trim();
+      if(c in COLORS){R.rainbow=COLORS[c]==='rainbow';if(!R.rainbow)R.color=COLORS[c];return;}
+      if(/^#[0-9a-f]{6}$/i.test(c)){R.rainbow=false;R.color=c;return;}
+      const sg=suggest(c,Object.keys(COLORS));
+      E(line,`Non conosco il colore "${a[0]}".`,sg?`Forse volevi: <code>colore("${sg}")</code>`:'Colori: '+Object.keys(COLORS).join(', '));
+    }
+    case 'spessore':{const w=num(a[0],line);if(w<1||w>40)E(line,'Lo spessore va da 1 a 40.');R.width=w;return;}
+    case 'penna_su':R.pen=false;return;
+    case 'penna_giu':R.pen=true;return;
+    case 'di':{const t=String(fmt(a[0]));say(t,Math.max(2600,t.length*90));await speak(t);if(stopFlag)throw STOP;return sleep(150);}
+    case 'centro':{const x0=R.x,y0=R.y,h0=R.h;R.moving=true;await animate(.4,p=>{R.x=x0+(300-x0)*p;R.y=y0+(300-y0)*p;R.h=h0*(1-p);});R.moving=false;return;}
+    case 'cancella':clearTrail();return;
+  }
+}
+async function execBlock(list){for(const s of list){if(stopFlag)throw STOP;await execStmt(s);}}
+async function execStmt(s){
+  setLine(s.line);
+  const v=speed(s.line);
+  await sleep(v>=20?0:Math.max(15,260/v));
+  switch(s.type){
+    case 'assign':{
+      const sub=hasName(s.expr)?exStr(s.expr,true):null,src=exStr(s.expr,false);
+      const val=ev(s.expr,s.line),isNew=!(s.name in vars);
+      if(!isNew)memPrev[s.name]=vars[s.name];
+      vars[s.name]=val;renderMem(s.name);
+      clog(s.line,`<b>${H(s.name)} = ${H(src)}</b>  <span class="ex">${isLit(s.expr)?(isNew?`→ creo la scatola «${H(s.name)}» e ci metto`:'→ nella scatola metto'):'→ '+(sub?H(sub)+' =':'')}</span> <span class="vv">${H(fmtV(val))}</span>`);
+      emitSignal(`${s.name} = ${fmt(val)}  (memoria)`,[0x10,...valBytes(val)]);return;}
+    case 'cmd':return cmd(s);
+    case 'repeat':{
+      let n=num(ev(s.expr,s.line),s.line,'Dopo "ripeti"');
+      if(n<0)E(s.line,'Non si può ripetere un numero negativo di volte!');
+      if(!Number.isInteger(n))E(s.line,`Non si può ripetere ${fmt(n)} volte: serve un numero intero.`,'Esempio: ripeti 4 volte:');
+      if(n>1000)E(s.line,'Troppe volte! Massimo 1000.');
+      clog(s.line,`<b>ripeti ${H(exStr(s.expr,false))} volte</b>  <span class="ex">→ ripeterò il blocco</span> <span class="vv">${n}</span> <span class="ex">volte</span>`,'loop');
+      for(let i=0;i<n;i++){
+        clog(s.line,`🔁 giro <span class="vv">${i+1}</span> di ${n}`,'loop');
+        depth++;try{await execBlock(s.body);}finally{depth--;}setLine(s.line);
+      }
+      clog(s.line,`✔ fine del ciclo: ${n} giri fatti, vado avanti`,'loop');
+      return;
+    }
+    case 'while':{
+      let k=0;
+      const check=()=>{const sub=exStr(s.expr,true),v=ev(s.expr,s.line);
+        clog(s.line,`🔁 <b>finché ${H(exStr(s.expr,false))} ?</b>  <span class="ex">→</span> ${H(sub)}  <span class="ex">→</span> ${v?`<b>vero</b>, giro ${k+1}`:'<b>falso</b>, esco dal ciclo'}`,v?'t':'f');return v;};
+      while(check()){
+        depth++;
+        if(++k>500){depth--;E(s.line,'Questo ciclo "finché" non finisce mai! 🔁','La condizione resta sempre vera: dentro al ciclo devi cambiare la variabile, per esempio <code>lato = lato + 10</code>');}
+        try{await execBlock(s.body);}finally{depth--;}setLine(s.line);
+      }
+      return;
+    }
+    case 'forever':for(let k=1;;k++){clog(s.line,`🔁 <b>per sempre</b>: giro <span class="vv">${k}</span>  <span class="ex">(si ferma solo con ■ Stop)</span>`,'loop');depth++;try{await execBlock(s.body);}finally{depth--;}setLine(s.line);}
+    case 'if':{
+      const sub=exStr(s.expr,true),v=ev(s.expr,s.line);
+      clog(s.line,`❓ <b>se ${H(exStr(s.expr,false))} ?</b>  <span class="ex">→</span> ${H(sub)}  <span class="ex">→</span> <b>${v?'vero':'falso'}</b>${v?', eseguo il blocco':s.els?', vado su «altrimenti»':', salto il blocco'}`,v?'t':'f');
+      depth++;try{if(v)await execBlock(s.body);else if(s.els)await execBlock(s.els);}finally{depth--;}
+      return;
+    }
+  }
+}
+
+/* =========================================================
+   CONSOLE: il programma racconta cosa fa
+   ========================================================= */
+const conLog=$('conLog');let depth=0,memPrev={},lastLogEl=null,botStr='';
+const fmtV=v=>typeof v==='string'?`"${v}"`:typeof v==='boolean'?(v?'vero':'falso'):fmt(v);
+function clog(line,html,cls=''){
+  const d=document.createElement('div');d.className='cl now '+cls;
+  d.innerHTML=(line?`<span class="ln">riga ${line}</span>`:'<span class="ln"></span>')+`<span class="tx" style="padding-left:${depth*20}px">${html}</span>`;
+  const stick=conLog.scrollTop+conLog.clientHeight>=conLog.scrollHeight-40;
+  if(lastLogEl)lastLogEl.classList.remove('now');lastLogEl=d;
+  conLog.appendChild(d);while(conLog.childElementCount>500)conLog.firstChild.remove();
+  if(stick)conLog.scrollTop=conLog.scrollHeight;
+}
+function conReset(){conLog.innerHTML='';lastLogEl=null;depth=0;memPrev={};renderMem();}
+function renderMem(changed){
+  const box=$('memBox'),keys=Object.keys(vars);
+  if(!keys.length){box.innerHTML='<div class="memEmpty">Ancora nessuna variabile</div>';return;}
+  box.innerHTML=keys.map(k=>`<div class="mem${k===changed?' flash':''}"><div class="n">${esc(k)}</div><div class="v">${esc(String(fmtV(vars[k])))}</div><div class="o">${k in memPrev?'prima: '+esc(String(fmtV(memPrev[k]))):'&nbsp;'}</div></div>`).join('');
+}
+const ARW=['↑','↗','→','↘','↓','↙','←','↖'];
+const dirOf=h=>((Math.round(h)%360)+360)%360;
+function updBot(){
+  const d=dirOf(R.h);
+  const str=`x = <b>${Math.round(R.x-300)}</b> &nbsp; y = <b>${Math.round(300-R.y)}</b><br>direzione = <b>${d}° ${ARW[Math.round(d/45)%8]}</b><br>penna = <b>${R.pen?'giù':'su'}</b> ${R.pen?`<span class="sw" style="background:${R.rainbow?'linear-gradient(90deg,red,orange,yellow,green,blue)':R.color}"></span>`:''} · spessore <b>${R.width}</b>`;
+  if(str!==botStr){botStr=str;$('botState').innerHTML=str+'<br><small style="color:#6b7299">il centro dell\'arena è (0, 0)</small>';}
+}
+function exStr(n,sub){
+  switch(n.t){
+    case 'num':return String(fmt(n.v));
+    case 'str':return `"${n.v}"`;
+    case 'name':return sub&&(n.v in vars)?String(fmtV(vars[n.v])):n.v;
+    case 'neg':return '-'+exStr(n.a,sub);
+    case 'not':return 'non '+exStr(n.a,sub);
+    case 'call':return `${n.name}(${n.args.map(a=>exStr(a,sub)).join(', ')})`;
+    case 'bin':{const w=x=>x.t==='bin'?`(${exStr(x,sub)})`:exStr(x,sub);return `${w(n.a)} ${n.op} ${w(n.b)}`;}
+  }
+  return '?';
+}
+const hasName=n=>!!n&&(n.t==='name'||hasName(n.a)||hasName(n.b)||(n.args||[]).some(hasName));
+const isLit=n=>n.t==='num'||n.t==='str'||(n.t==='neg'&&n.a.t==='num');
+const H=t=>esc(String(t));
+function explainCmd(name,a){
+  const v=a.map(fmtV);
+  switch(name){
+    case 'avanti':return `vado avanti di <span class="vv">${v[0]}</span> passi`;
+    case 'indietro':return `torno indietro di <span class="vv">${v[0]}</span> passi`;
+    case 'destra':case 'gira_destra':return `giro a destra di <span class="vv">${v[0]}°</span> → guarderò verso ${dirOf(R.h+a[0])}°`;
+    case 'sinistra':case 'gira_sinistra':return `giro a sinistra di <span class="vv">${v[0]}°</span> → guarderò verso ${dirOf(R.h-a[0])}°`;
+    case 'attendi':return `aspetto <span class="vv">${v[0]}</span> secondi`;
+    case 'colore':return `prendo la penna <span class="vv">${H(a[0])}</span>`;
+    case 'spessore':return `linea spessa <span class="vv">${v[0]}</span>`;
+    case 'penna_su':return 'alzo la penna: smetto di disegnare';
+    case 'penna_giu':return 'abbasso la penna: ricomincio a disegnare';
+    case 'di':return `OUTPUT → scrivo sullo schermo e lo dico ad alta voce: «${H(a[0])}»`;
+    case 'centro':return 'torno al centro, in (0, 0)';
+    case 'cancella':return 'cancello il disegno';
+  }
+  return '';
+}
+
+/* ---------- verifica dei poligoni: la figura si chiude? ---------- */
+let POLY=null;
+function polyStart(){POLY={moves:[],turn:0,x0:R.x,y0:R.y};}
+function polyCheck(){
+  const P=POLY;if(!P||P.moves.length<3)return false;
+  const L=P.moves[0];if(!L||P.moves.some(m=>Math.abs(m-L)>0.01))return false;      // solo lati tutti uguali: un tentativo di poligono
+  const closed=Math.hypot(R.x-P.x0,R.y-P.y0)<2,tot=Math.round(P.turn);
+  if(P.bonk&&!closed){
+    say('Il robot ha sbattuto contro il muro: prova un lato più corto!',3500);speak('Ho sbattuto contro il muro. Prova un lato più corto!');
+    clog(0,'🧱 Il robot ha sbattuto contro il muro, quindi non posso dire se la figura si chiude. Prova un <b>lato</b> più corto.','f');return true;
+  }
+  if(closed){
+    say('🎉 Figura chiusa! Hai trovato l\'angolo giusto',3500);speak('Figura chiusa! Hai trovato l\'angolo giusto');sfx.ok();
+    clog(0,`🎉 Figura chiusa! ${P.moves.length} lati uguali, ho girato in tutto <span class="vv">${tot}°</span>${Math.abs(tot)===360?' = un giro completo':Math.abs(tot)%360===0?` = ${Math.abs(tot)/360} giri completi`:''}`,'t');
+  }else{
+    say('Uhm… la figura non si chiude. Prova un altro angolo!',3500);speak('La figura non si chiude. Prova un altro angolo!');sfx.bonk();
+    clog(0,`🤔 La figura non si chiude: ${P.moves.length} lati, ho girato in tutto <span class="vv">${tot}°</span>. Per chiudere un poligono servono 360°.`,'f');
+  }
+  return true;
+}
+
+function setRunning(on){
+  running=on;$('runBtn').disabled=on;$('stopBtn').disabled=!on;ta.readOnly=on;
+}
+async function run(){
+  if(running)return;
+  clearError();resetRobot();clearTrail();setLine(0);
+  let prog;
+  vars={};conReset();
+  try{prog=parseProgram(ta.value);}catch(e){if(e.isCodeErr){clog(0,`💥 Il programma non può nemmeno partire: errore alla <b>riga ${e.line}</b>. ${e.msg}`,'err');return crash(e);}throw e;}
+  clog(0,'▶ Avvio del programma: il computer legge le righe dall\'alto in basso','sys');
+  sfx.start();stopFlag=false;setRunning(true);polyStart();
+  try{
+    await execBlock(prog);
+    setLine(0);depth=0;clog(0,'✅ Fine del programma: tutte le righe eseguite','sys');if(!polyCheck()){say('Finito! ✅',2500);sfx.ok();}
+  }catch(e){
+    setLine(0);
+    depth=0;
+    if(e===STOP){say('Stop! ✋',1800);clog(0,'■ Programma fermato con Stop','sys');}
+    else if(e&&e.isCodeErr){clog(e.line,`💥 ERRORE: ${e.msg} Il programma si blocca qui.`,'err');setRunning(false);return crash(e);}
+    else{console.error(e);setRunning(false);return crash(new CodeErr(curLine,'Qualcosa è andato storto.',String(e&&e.message||e)));}
+  }finally{setRunning(false);}
+}
+$('runBtn').onclick=run;
+$('stopBtn').onclick=()=>{hardStop();};
+
+/* ---------- l'errore "corrompe" il codice ---------- */
+let crashTimer=null;
+function crash(e){
+  hardStop();setRunning(false);
+  errLineN=e.line||0;
+  R.glitch=1;say('3RR0R... c0d1c3 c0rr0tt0!',4000);sfx.crash();setTimeout(()=>speak('Errore! Codice corrotto!'),900);
+  noise=110;bitQ=[];MOT.a=MOT.b=0;$('sigCmd').textContent='⚠ segnale disturbato!';$('sigArr').textContent=$('sigArr2').textContent='';$('sigHex').textContent='?? ??';$('sigBin').textContent='▓▒░▓▒░▓▒';
+  for(let i=0;i<30;i++)sparks.push({x:R.x,y:R.y-20,vx:(Math.random()-.5)*9,vy:-Math.random()*7,life:40,h:Math.random()<.5?350:45});
+  const ed=$('editor');ed.classList.add('glitch');
+  const nLines=ta.value.split('\n').length,center=(e.line||1)-1;
+  const t0=performance.now(),SPREAD=750,HOLD=350,BACK=600;
+  clearInterval(crashTimer);
+  crashTimer=setInterval(()=>{
+    const t=performance.now()-t0;
+    let radius;
+    if(t<SPREAD)radius=(t/SPREAD)*nLines;
+    else if(t<SPREAD+HOLD)radius=nLines;
+    else radius=nLines*(1-(t-SPREAD-HOLD)/BACK);
+    if(t>SPREAD+HOLD+BACK){
+      clearInterval(crashTimer);corruptFn=null;ed.classList.remove('glitch');renderEditor();showError(e);return;
+    }
+    corruptFn=(l,i)=>{const d=Math.abs(i-center);if(i===center)return corruptLine(l,.7);if(d<=radius)return corruptLine(l,Math.max(.15,.6-d/(radius+1)*.5));return hlLine(l);};
+    renderEditor();
+  },55);
+}
+function showError(e){
+  $('errT').textContent=`💥 Errore alla riga ${e.line}: ${e.msg}`;
+  $('errH').innerHTML=(e.hint?'💡 '+e.hint+'<br>':'')+'<span style="color:#b98a96">Un solo errore blocca tutto il programma. Correggilo, oppure premi ↺ Ripristina.</span>';
+  $('errBox').classList.add('on');$('resetBtn').classList.add('pulse');
+  placeLine($('errLine'),errLineN);
+  const top=PAD+(errLineN-1)*LH;if(top<ta.scrollTop||top>ta.scrollTop+ta.clientHeight-LH)ta.scrollTop=top-60;
+}
+function clearError(){
+  clearInterval(crashTimer);corruptFn=null;$('editor').classList.remove('glitch');
+  errLineN=0;$('errBox').classList.remove('on');$('resetBtn').classList.remove('pulse');R.glitch=0;placeLine($('errLine'),0);
+  renderEditor();
+}
+
+$('resetBtn').onclick=()=>{
+  hardStop();setRunning(false);
+  ta.value=ORIGINAL;ta.scrollTop=0;clearError();setLine(0);resetRobot();clearTrail();renderEditor();
+  say('Codice ripristinato! 🔧',1800);sfx.ok();
+};
+
+/* ---------- tabs ---------- */
+let curView='vArena';
+function setView(v){
+  curView=v;
+  document.querySelectorAll('.vtabs button').forEach(x=>x.classList.toggle('on',x.dataset.view===v));
+  ['vArena','vConsole','vDentro'].forEach(id=>$(id).classList.toggle('hidden',id!==v));
+  $('ovSfide').classList.add('hidden');$('ovRef').classList.add('hidden');
+  requestAnimationFrame(()=>{resizeArena();resizeScope();if(v==='vConsole'){renderMem();conLog.scrollTop=conLog.scrollHeight;}});
+}
+document.querySelectorAll('.vtabs button').forEach(b=>b.onclick=()=>setView(b.dataset.view));
+$('sfideBtn').onclick=()=>{$('ovRef').classList.add('hidden');$('ovSfide').classList.remove('hidden');};
+$('refBtn').onclick=()=>{$('ovSfide').classList.add('hidden');$('ovRef').classList.toggle('hidden');};
+document.querySelectorAll('.ovX').forEach(b=>b.onclick=()=>$(b.dataset.close).classList.add('hidden'));
+const m1Ctx=fitCanvas($('mini1'),190,190,190),m2Ctx=fitCanvas($('mini2'),170,170,170);
+
+/* =========================================================
+   RICORDO A4 → PDF (generato nel browser, senza librerie)
+   ========================================================= */
+/* ---------- EVENTI: ogni evento ha il suo ricordo ----------
+   Per aggiungerne uno: copiare un blocco e cambiare i testi. */
+const EVENTI={
+  openday2627:{nome:'Open Day 2026/27',badge:'🎉 Open Day 2026/27',intestazione:'Open Day 2026/27',titolo:'PATENTE DI ROBOT CODER',a:'rilasciata a',piede:'Open Day 2026/27 · Laboratorio di coding Robot Coder'},
+  laboratorio:{nome:'Laboratorio di coding',badge:'💻 Laboratorio di coding',intestazione:'Laboratorio di coding',titolo:'ATTESTATO DI ROBOT CODER',a:'conseguito da',piede:'Laboratorio di coding · Robot Coder'}
+};
+const EVENTO_PREDEFINITO='openday2627';
+let evId=EVENTO_PREDEFINITO;
+const EV=()=>EVENTI[evId]||EVENTI[EVENTO_PREDEFINITO];
+function showEvent(){$('evBadge').textContent=EV().badge;const sel=$('evSel');if(sel)sel.value=evId;}
+(()=>{const sel=$('evSel');sel.innerHTML=Object.entries(EVENTI).map(([k,e])=>`<option value="${k}">${e.nome}</option>`).join('');
+  sel.onchange=async()=>{evId=sel.value;try{await idb.set('evento',evId);}catch(e){}showEvent();const m=$('tPanelMsg');m.className='tmsg ok';m.textContent='✅ Evento: '+EV().nome+'. I prossimi ricordi useranno questa intestazione.';};
+  showEvent();})();
+const SCUOLA='Istituto “Enrico Mestica”';
+const CITTA='Civitanova Marche';
+const CW=1240,CHH=1754,CSCALE=1654/1240;   // disegno in unità 150dpi, render a 200dpi
+const certCv=document.createElement('canvas');certCv.width=1654;certCv.height=2339;
+
+function fitText(c,txt,maxW,size,weight,fam){let s=size;do{c.font=`${weight} ${s}px ${fam}`;s-=2;}while(c.measureText(txt).width>maxW&&s>10);}
+function trailBBox(){
+  const d=tctx.getImageData(0,0,1200,1200).data;let x0=1200,y0=1200,x1=-1,y1=-1;
+  for(let y=0;y<1200;y+=2)for(let x=0;x<1200;x+=2){if(d[(y*1200+x)*4+3]>20){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;}}
+  if(x1<0)return{x:0,y:0,s:1200};
+  const pad=60,cx=(x0+x1)/2,cy=(y0+y1)/2;let s=Math.max(x1-x0,y1-y0)+pad*2;s=Math.max(s,360);s=Math.min(s,1200);
+  let x=cx-s/2,y=cy-s/2;x=Math.max(0,Math.min(1200-s,x));y=Math.max(0,Math.min(1200-s,y));
+  return{x,y,s};
+}
+function renderCert(withDraw){
+  const c=certCv.getContext('2d');c.setTransform(CSCALE,0,0,CSCALE,0,0);
+  const tr=ID.traits,h=tr.hue;
+  const col=l=>`hsl(${h},70%,${l}%)`;
+  c.fillStyle='#fff';c.fillRect(0,0,CW,CHH);
+  // cornice
+  c.strokeStyle=col(55);c.lineWidth=8;c.beginPath();c.roundRect(40,40,CW-80,CHH-80,28);c.stroke();
+  c.strokeStyle=col(85);c.lineWidth=2;c.beginPath();c.roundRect(58,58,CW-116,CHH-116,20);c.stroke();
+  // circuiti decorativi negli angoli
+  c.strokeStyle=col(80);c.lineWidth=3;c.fillStyle=col(80);
+  for(const [x,y,sx,sy] of [[58,58,1,1],[CW-58,58,-1,1],[58,CHH-58,1,-1],[CW-58,CHH-58,-1,-1]]){
+    for(let i=0;i<3;i++){const o=30+i*22;c.beginPath();c.moveTo(x+sx*o,y);c.lineTo(x+sx*o,y+sy*(40+i*15));c.lineTo(x+sx*(o+30),y+sy*(70+i*15));c.stroke();circ(c,x+sx*(o+30),y+sy*(70+i*15),5);}
+  }
+  c.textAlign='center';c.textBaseline='alphabetic';
+  const ls=v=>{if('letterSpacing' in c)c.letterSpacing=v;};
+  // intestazione
+  c.fillStyle='#8a8fa3';c.font='600 24px Fredoka,sans-serif';ls('4px');
+  c.fillText((SCUOLA+' · '+EV().intestazione).toUpperCase(),CW/2,150);
+  c.fillStyle='#1b1f45';c.font='700 64px Fredoka,sans-serif';ls('2px');
+  fitText(c,EV().titolo,1060,64,'700','Fredoka,sans-serif');ls('2px');c.fillText(EV().titolo,CW/2,232);ls('0px');
+  c.fillStyle='#8a8fa3';c.font='500 30px Fredoka,sans-serif';c.fillText(EV().a,CW/2,290);
+  c.fillStyle=col(45);fitText(c,ID.show,1000,96,'700','Fredoka,sans-serif');c.fillText(ID.show,CW/2,380);
+  // riga centrale: robot (+ disegno)
+  const two=ID.bytes.length>12,top=410,bh=two?340:470;
+  const box=(x,w,label)=>{c.fillStyle=`hsl(${h},70%,96%)`;c.beginPath();c.roundRect(x,top,w,bh,24);c.fill();c.strokeStyle=col(85);c.lineWidth=3;c.stroke();
+    if(label){c.fillStyle=col(40);c.font='600 24px Fredoka,sans-serif';c.fillText(label,x+w/2,top+42);}};
+  if(withDraw){
+    box(100,500,'Il mio robot');drawRobot(c,350,top+(two?205:278),two?255:360,tr,{t:.3});
+    box(640,500,'Il mio primo programma');
+    const as=two?270:400,ax=640+(500-as)/2,ay=top+58,bb=trailBBox();
+    c.fillStyle='#f7f4ec';c.fillRect(ax,ay,as,as);
+    c.save();c.beginPath();c.rect(ax,ay,as,as);c.clip();
+    c.strokeStyle='#e6e8f2';c.lineWidth=1;const kk=as/bb.s;
+    for(let g=Math.ceil(bb.x/60)*60;g<=bb.x+bb.s;g+=60){const x=ax+(g-bb.x)*kk;c.beginPath();c.moveTo(x,ay);c.lineTo(x,ay+as);c.stroke();}
+    for(let g=Math.ceil(bb.y/60)*60;g<=bb.y+bb.s;g+=60){const y=ay+(g-bb.y)*kk;c.beginPath();c.moveTo(ax,y);c.lineTo(ax+as,y);c.stroke();}
+    c.drawImage(trail,bb.x,bb.y,bb.s,bb.s,ax,ay,as,as);c.restore();
+    c.strokeStyle='#cdd2ea';c.lineWidth=2;c.strokeRect(ax,ay,as,as);
+  }else{
+    box(100,CW-200,'');drawRobot(c,CW/2,top+(two?195:262),two?270:390,tr,{t:.3});
+  }
+  // nome robot
+  c.fillStyle='#1b1f45';fitText(c,ID.full,1060,92,'700','Fredoka,sans-serif');c.fillText(ID.full,CW/2,top+bh+90);
+  c.fillStyle='#8a8fa3';c.font='500 28px Fredoka,sans-serif';
+  c.fillText(`il robot di ${ID.show}: ${EYES[tr.eye]}, ${ANTS[tr.ant]}, ${BODIES[tr.body]}`,CW/2,top+bh+130);
+  // decodifica
+  let y=top+bh+192;
+  c.fillStyle=col(40);c.font='700 32px Fredoka,sans-serif';c.fillText('Il tuo nome nel linguaggio dei computer',CW/2,y);
+  const n=ID.bytes.length,rows=two?2:1,per=Math.ceil(n/rows),gap=10,cw=Math.min(120,(CW-200-gap*(per-1))/per);
+  y+=24;const ch=two?120:150;
+  ID.bytes.forEach((b,i)=>{
+    const r=Math.floor(i/per),j=i%per,cnt=Math.min(per,n-r*per),x0=CW/2-(cnt*cw+(cnt-1)*gap)/2;
+    const x=x0+j*(cw+gap),yy=y+r*(ch+gap);
+    c.fillStyle='#f4f5fb';c.beginPath();c.roundRect(x,yy,cw,ch,14);c.fill();c.strokeStyle='#dfe2f0';c.lineWidth=2;c.stroke();
+    const mx=x+cw/2;
+    c.fillStyle=i>=ID.nameLen?col(40):b===32?'#9aa0c8':'#1b1f45';c.font=`700 ${Math.round(cw*.38)}px Fredoka,sans-serif`;c.fillText(LBLI(i,b),mx,yy+cw*.38+12);
+    c.fillStyle='#8a8fa3';c.font=`500 ${Math.round(cw*.17)}px Fredoka,sans-serif`;c.fillText(String(b),mx,yy+cw*.38+12+cw*.2);
+    const bin=b.toString(2).padStart(8,'0');
+    c.font=`600 ${Math.round(Math.min(18,cw*.135))}px "JetBrains Mono",monospace`;
+    const bw=c.measureText(bin).width;let bx=mx-bw/2;c.textAlign='left';
+    for(const d of bin){c.fillStyle=d==='1'?'#1b8fb5':'#c2c6dc';c.fillText(d,bx,yy+ch-(two?36:46));bx+=c.measureText(d).width;}
+    c.textAlign='center';
+    c.fillStyle=col(42);c.font=`700 ${Math.round(Math.min(30,cw*.26))}px "JetBrains Mono",monospace`;c.fillText(hex2(b),mx,yy+ch-12);
+  });
+  y+=(rows-1)*(ch+gap);
+  y+=ch+44;
+  c.font='500 26px Fredoka,sans-serif';c.fillStyle='#3a3f66';
+  const lines=[
+    `Esadecimale: ${ID.bytes.map(hex2).join(' ')}`+(ID.serial>1?`  (l'ultimo è il n° di serie ${ID.serial})`:''),
+    `Somma ${ID.sum} = ${ID.sumHex} (esadecimale)  →  sigla ${ID.kid[0]} + ${ID.tail} = ${ID.sigla}`,
+    `Byte mescolati (XOR) = ${hex2(ID.xor)}  →  ultima cifra ${(ID.xor&15).toString(16).toUpperCase()} = nome n° ${ID.nickIdx}  →  ${ID.nick}`
+  ];
+  lines.forEach((l,i)=>{fitText(c,l,1060,26,'500','Fredoka,sans-serif');c.fillText(l,CW/2,y+i*34);});
+  // impulsi elettrici
+  y+=lines.length*34+26;
+  c.fillStyle=col(40);c.font='700 30px Fredoka,sans-serif';c.fillText('⚡ Il tuo nome come impulsi elettrici',CW/2,y);
+  const wx0=110,wW=CW-220,bwid=wW/(per*8),amp=two?38:55,rowH=two?92:0;
+  for(let r=0;r<rows;r++){
+    const bs=ID.bytes.slice(r*per,(r+1)*per);if(!bs.length)break;
+    const bits=bs.flatMap(b=>[...b.toString(2).padStart(8,'0')].map(Number));
+    const base=y+(two?70:95)+r*rowH;
+    c.strokeStyle='#e6e8f2';c.lineWidth=1;
+    for(let i=0;i<=bits.length;i+=8){const x=wx0+i*bwid;c.beginPath();c.moveTo(x,base-amp-10);c.lineTo(x,base+6);c.stroke();}
+    c.fillStyle='#8a8fa3';c.font='500 16px Fredoka,sans-serif';c.textAlign='right';
+    c.fillText('3,3 V',wx0-8,base-amp+5);c.fillText('0 V',wx0-8,base+5);c.textAlign='center';
+    c.strokeStyle=col(45);c.lineWidth=4;c.lineJoin='round';c.beginPath();
+    bits.forEach((v,i)=>{const x=wx0+i*bwid,yy=base-v*amp;if(i===0)c.moveTo(x,yy);else c.lineTo(x,yy);c.lineTo(x+bwid,yy);});
+    c.stroke();
+    c.fillStyle='#8a8fa3';c.font='600 18px Fredoka,sans-serif';
+    bs.forEach((b,i)=>c.fillText(LBLI(r*per+i,b),wx0+(i*8+4)*bwid,base+26));
+  }
+  // piè di pagina
+  const fy=CHH-110;
+  const d=new Date().toLocaleDateString('it-IT',{day:'numeric',month:'long',year:'numeric'});
+  c.textAlign='left';c.fillStyle='#3a3f66';c.font='500 24px Fredoka,sans-serif';c.fillText(`${CITTA}, ${d}`,150,fy);
+  c.textAlign='center';c.strokeStyle='#9aa0c8';c.lineWidth=2;c.beginPath();c.moveTo(800,fy-4);c.lineTo(1130,fy-4);c.stroke();
+  c.fillStyle='#8a8fa3';c.font='500 20px Fredoka,sans-serif';c.fillText('il docente',965,fy+26);
+  c.fillStyle='#b4b8cf';c.font='500 18px Fredoka,sans-serif';c.fillText(EV().piede,CW/2,CHH-70);
+}
+
+function pagesToPdf(pages,title){
+  const enc=new TextEncoder(),parts=[],offs=[];let len=0;
+  const put=x=>{const b=typeof x==='string'?enc.encode(x):x;parts.push(b);len+=b.length;};
+  const obj=(n,body)=>{offs[n]=len;put(`${n} 0 obj\n`);if(typeof body==='string')put(body);else body();put('\nendobj\n');};
+  const PW=595.28,PH=841.89,N=pages.length,info=3+3*N;
+  put('%PDF-1.4\n%âã\n');
+  obj(1,'<< /Type /Catalog /Pages 2 0 R >>');
+  obj(2,`<< /Type /Pages /Kids [${pages.map((_,i)=>`${3+3*i} 0 R`).join(' ')}] /Count ${N} >>`);
+  const cs=`q ${PW} 0 0 ${PH} 0 0 cm /Im0 Do Q`;
+  pages.forEach((p,i)=>{
+    const o=3+3*i;
+    obj(o,`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${PW} ${PH}] /Resources << /XObject << /Im0 ${o+1} 0 R >> >> /Contents ${o+2} 0 R >>`);
+    obj(o+1,()=>{put(`<< /Type /XObject /Subtype /Image /Width ${p.w} /Height ${p.h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${p.jpg.length} >>\nstream\n`);put(p.jpg);put('\nendstream');});
+    obj(o+2,`<< /Length ${cs.length} >>\nstream\n${cs}\nendstream`);
+  });
+  const safe=title.replace(/[^\x20-\x7e]/g,'').replace(/[()\\]/g,'');
+  obj(info,`<< /Title (${safe}) /Producer (Robot Coder) >>`);
+  const xref=len;
+  let x=`xref\n0 ${info+1}\n0000000000 65535 f \n`;for(let i=1;i<=info;i++)x+=String(offs[i]).padStart(10,'0')+' 00000 n \n';
+  put(x);put(`trailer\n<< /Size ${info+1} /Root 1 0 R /Info ${info} 0 R >>\nstartxref\n${xref}\n%%EOF\n`);
+  return new Blob(parts,{type:'application/pdf'});
+}
+/* estrae le immagini JPEG da un PDF creato da Robot Coder (anche già unito) */
+function extractPages(u8){
+  const s=new TextDecoder('latin1').decode(u8),re=/\/Width (\d+) \/Height (\d+)[^>]*?\/Filter \/DCTDecode \/Length (\d+) >>\nstream\n/g,out=[];let m;
+  while((m=re.exec(s))){const st=m.index+m[0].length,L=+m[3];out.push({w:+m[1],h:+m[2],jpg:u8.slice(st,st+L)});re.lastIndex=st+L;}
+  return out;
+}
+
+/* ---------- cartella dei ricordi (solo versione offline, Chrome/Edge) ---------- */
+const IN_FRAME=(()=>{try{return window.self!==window.top;}catch(e){return true;}})();
+const FS_OK='showDirectoryPicker' in window&&!IN_FRAME;
+let dirHandle=null;
+const idb={
+  db(){return new Promise((res,rej)=>{const r=indexedDB.open('robotcoder',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});},
+  async get(k){const d=await this.db();return new Promise(res=>{const t=d.transaction('kv').objectStore('kv').get(k);t.onsuccess=()=>res(t.result);t.onerror=()=>res(null);});},
+  async set(k,v){const d=await this.db();return new Promise(res=>{const t=d.transaction('kv','readwrite').objectStore('kv').put(v,k);t.onsuccess=()=>res(true);t.onerror=()=>res(false);});}
+};
+(async()=>{try{const v=await idb.get('evento');if(v&&EVENTI[v]){evId=v;showEvent();}}catch(e){}})();   // evento scelto su questo PC
+async function ensurePerm(h){try{if(!h.queryPermission)return true;if((await h.queryPermission({mode:'readwrite'}))==='granted')return true;return (await h.requestPermission({mode:'readwrite'}))==='granted';}catch(e){return false;}}
+function showDir(){
+  if(!FS_OK){$('dirName').textContent=IN_FRAME?'disponibile solo nel file offline (i PDF vanno in Download)':'il browser non lo permette: i PDF vanno in Download';$('dirBtn').classList.add('hidden');return;}
+  $('dirName').textContent=dirHandle?'«'+dirHandle.name+'»':'non scelta (i PDF vanno in Download)';
+}
+async function pickDir(){
+  try{const h=await window.showDirectoryPicker({id:'ricordi',mode:'readwrite'});dirHandle=h;fallbackCount=0;try{await idb.set('dir',h);}catch(e){}showDir();checkDir();sfx.ok();}
+  catch(e){if(e&&e.name!=='AbortError'){$('dirName').textContent='non riesco ad aprire le cartelle qui';}}
+}
+(async()=>{if(!FS_OK){showDir();return;}try{dirHandle=(await idb.get('dir'))||null;}catch(e){}showDir();checkDir();})();
+
+const stamp=()=>{const d=new Date(),z=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}_${z(d.getHours())}-${z(d.getMinutes())}-${z(d.getSeconds())}`;};
+/* paracadute: se la cartella non risponde, il PDF va comunque in Download */
+let fallbackCount=0;
+const withTimeout=(p,ms)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),ms))]);
+async function writeToDir(dir,fname,blob){
+  if(!(await withTimeout(ensurePerm(dir),20000)))throw new Error('permesso negato');
+  await withTimeout((async()=>{
+    const fh=await dir.getFileHandle(fname,{create:true});const w=await fh.createWritable();await w.write(blob);await w.close();
+    const chk=await (await dir.getFileHandle(fname)).getFile();            // verifica: il file c'è davvero ed è completo
+    if(chk.size!==blob.size)throw new Error('file incompleto');
+  })(),8000);
+}
+async function downloadFile(fname,blob){
+  let dl=null;
+  try{if(window.claude&&claude.use)dl=await claude.use('downloads');}catch(e){}
+  if(dl){
+    try{await dl.save({filename:fname,data:blob});return 'salvato';}
+    catch(e){throw new Error(e&&e.code==='declined'?'Salvataggio annullato.':'Non sono riuscito a salvare ('+(e&&e.code||'errore')+').');}
+  }
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=fname;document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),10000);
+  return 'Download';
+}
+/* =========================================================
+   PONTE DRIVE (Apps Script dell'account dedicato della scuola)
+   ========================================================= */
+const DRIVE_URL_DEFAULT='';     // facoltativo: incolla qui l'URL /exec per non doverlo inserire su ogni PC
+const DRIVE_TOKEN_DEFAULT='';   // facoltativo: il CODICE dello script
+const DRV={url:DRIVE_URL_DEFAULT,token:DRIVE_TOKEN_DEFAULT,folderUrl:null,folderName:null,ok:null};
+const GAS=typeof google!=='undefined'&&google.script&&google.script.run;   // pagina servita come web app Apps Script
+const driveOn=()=>!!(GAS||(DRV.url&&DRV.token));
+async function driveCall(action,data={},ms=15000){
+  if(GAS){
+    const j=await withTimeout(new Promise((res,rej)=>google.script.run.withSuccessHandler(res).withFailureHandler(e=>rej(new Error(e&&e.message||'errore dello script'))).api({action,...data})),ms);
+    if(!j||!j.ok)throw new Error(j&&j.err||'errore dello script');
+    return j;
+  }
+  const r=await withTimeout(fetch(DRV.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({token:DRV.token,action,...data}),redirect:'follow'}),ms);
+  if(!r.ok)throw new Error('risposta '+r.status);
+  let j;try{j=await r.json();}catch(e){throw new Error('risposta non valida: controlla l\'URL');}
+  if(!j.ok)throw new Error(j.err||'errore dello script');
+  return j;
+}
+function blobToB64(blob){return new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>res(String(fr.result).split(',')[1]);fr.onerror=()=>rej(fr.error);fr.readAsDataURL(blob);});}
+function b64ToBytes(b){const s=atob(b),u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u;}
+async function saveDriveCfg(){try{await idb.set('drive',{url:DRV.url,token:DRV.token,folderUrl:DRV.folderUrl,folderName:DRV.folderName});}catch(e){}}
+async function drivePing(){
+  if(!driveOn()){showDrive();return false;}
+  DRV.ok=null;showDrive();
+  try{const j=await driveCall('ping',{},12000);DRV.folderUrl=j.folderUrl;DRV.folderName=j.folderName;DRV.ok=true;saveDriveCfg();flushReg();}
+  catch(e){DRV.ok=false;DRV.err=e.message;}
+  showDrive();return DRV.ok;
+}
+function showDrive(){
+  const n=$('drvName');if(!n)return;
+  $('drvCfg').classList.toggle('hidden',!!GAS);
+  $('mDrive').classList.toggle('hidden',!driveOn());
+  if(!driveOn()){n.textContent='non configurata';$('drvOpen').classList.add('hidden');$('drvLink').classList.add('hidden');return;}
+  n.innerHTML=DRV.ok===true?`«${esc(DRV.folderName||'Drive')}» <span style="color:var(--ok)">✓ collegata</span>`:DRV.ok===false?`<span style="color:var(--err)">⚠ non raggiungibile${DRV.err?' ('+esc(DRV.err)+')':''}</span>`:'controllo…';
+  const has=!!DRV.folderUrl;$('drvOpen').classList.toggle('hidden',!has);$('drvLink').classList.toggle('hidden',!has);if(has)$('drvOpen').href=DRV.folderUrl;
+}
+(async()=>{try{const c=await idb.get('drive');if(c&&c.url){Object.assign(DRV,c);}}catch(e){}showDrive();if(driveOn())drivePing();})();
+setInterval(()=>{if(driveOn()&&DRV.ok===false&&!running)drivePing().then(ok=>{if(ok){setDirState('ok');}});},60000);   // se Drive torna, ricollega da solo
+$('drvCfg').onclick=()=>{$('drvForm').classList.toggle('hidden');$('drvUrl').value=DRV.url||'';$('drvTok').value=DRV.token||'';$('drvUrl').focus();};
+$('drvSave').onclick=async()=>{
+  const u=$('drvUrl').value.trim(),t=$('drvTok').value.trim(),m=$('tPanelMsg');
+  if(!/^https:\/\/script\.google\.com\/.+\/exec$/.test(u)){m.className='tmsg bad';m.textContent='L\'URL deve essere quello dello script e finire con /exec';return;}
+  if(!t){m.className='tmsg bad';m.textContent='Manca il codice.';return;}
+  DRV.url=u;DRV.token=t;DRV.folderUrl=null;m.className='tmsg';m.textContent='Provo il collegamento…';
+  const ok=await drivePing();await saveDriveCfg();
+  if(ok){m.className='tmsg ok';m.textContent='✅ Collegato alla cartella Drive. I ricordi andranno lì.';$('drvForm').classList.add('hidden');}
+  else{m.className='tmsg bad';m.textContent='⚠ Non riesco a collegarmi: '+(DRV.err||'')+'. Controlla URL, codice e internet.';}
+};
+$('drvClear').onclick=async()=>{DRV.url=DRV.token='';DRV.folderUrl=DRV.folderName=null;DRV.ok=null;await saveDriveCfg();showDrive();$('drvForm').classList.add('hidden');$('tPanelMsg').className='tmsg';$('tPanelMsg').textContent='Drive scollegato su questo PC.';};
+$('drvLink').onclick=async()=>{
+  const txt=`[InternetShortcut]\r\nURL=${DRV.folderUrl}\r\nIconIndex=0\r\n`,blob=new Blob([txt],{type:'application/octet-stream'}),name='Ricordi Open Day.url',m=$('tPanelMsg');
+  try{
+    if('showSaveFilePicker' in window&&!IN_FRAME){
+      const h=await window.showSaveFilePicker({suggestedName:name,startIn:'desktop',types:[{description:'Collegamento',accept:{'application/octet-stream':['.url']}}]});
+      const w=await h.createWritable();await w.write(blob);await w.close();
+      m.className='tmsg ok';m.textContent='✅ Collegamento creato: un doppio clic apre la cartella Drive.';
+    }else{await downloadFile(name,blob);m.className='tmsg ok';m.textContent='✅ Collegamento scaricato in Download: spostalo sul desktop.';}
+  }catch(e){if(e&&e.name!=='AbortError'){m.className='tmsg bad';m.textContent='Non riesco a creare il collegamento.';}}
+};
+
+async function saveFile(fname,blob,dir,opts={}){
+  if(!dir&&driveOn()){
+    const m=$('certMsg');if($('certModal').classList.contains('on'))m.textContent='Invio il ricordo alla cartella Drive…';
+    try{
+      await driveCall('upload',{name:fname,b64:await blobToB64(blob),merged:!!opts.merged},opts.merged?120000:DRV.ok===false?8000:25000);
+      DRV.ok=true;showDrive();setDirState('ok');
+      return{warn:false,html:`✅ Salvato nella cartella Drive «${esc(DRV.folderName||'Ricordi Open Day')}»:<br><small>${fname}</small>`};
+    }catch(e){
+      console.warn('Drive non raggiungibile:',e);DRV.ok=false;DRV.err=e.message;showDrive();
+      fallbackCount++;setDirState('down');
+      await downloadFile(fname,blob);
+      return{warn:true,html:`⚠ La cartella Drive non risponde, ma il ricordo <b>non è perso</b>: l'ho salvato nella cartella <b>Download</b> di questo PC.<br><small>${fname}</small>`};
+    }
+  }
+  dir=dir||dirHandle;
+  if(dir){
+    try{
+      const m=$('certMsg');if($('certModal').classList.contains('on'))m.textContent=`Salvo nella cartella «${dir.name}»…`;
+      await writeToDir(dir,fname,blob);
+      setDirState('ok');
+      return{warn:false,html:`✅ Salvato nella cartella «${dir.name}»:<br><small>${fname}</small>`};
+    }catch(e){
+      console.warn('cartella non raggiungibile:',e);
+      fallbackCount++;setDirState('down');
+      await downloadFile(fname,blob);
+      return{warn:true,html:`⚠ La cartella «${dir.name}» non risponde, ma il ricordo <b>non è perso</b>: l'ho salvato nella cartella <b>Download</b> di questo PC.<br><small>${fname}</small>`};
+    }
+  }
+  const where=await downloadFile(fname,blob);
+  return{warn:false,html:where==='Download'?`✅ Scaricato in Download:<br><small>${fname}</small>`:'✅ PDF salvato!'};
+}
+/* stato della cartella, visibile al docente */
+function setDirState(st){
+  const el=$('dirWarn');if(!el)return;
+  if(st==='down'){el.classList.remove('hidden');el.innerHTML=`⚠ Cartella ricordi non raggiungibile: salvo in Download (${fallbackCount} file)`;}
+  else if(st==='ok'&&fallbackCount){el.classList.remove('hidden');el.innerHTML=`✅ Cartella di nuovo raggiungibile · ${fallbackCount} ricordi sono rimasti in Download`;}
+  else el.classList.add('hidden');
+  const t=$('dirName');
+  if(t&&dirHandle)t.innerHTML=`«${esc(dirHandle.name)}» `+(st==='down'?'<span style="color:var(--err)">⚠ non raggiungibile</span>':st==='ok'?'<span style="color:var(--ok)">✓</span>':'');
+}
+async function checkDir(){
+  if(!dirHandle)return;
+  try{
+    if(dirHandle.queryPermission&&(await dirHandle.queryPermission({mode:'readwrite'}))!=='granted'){$('dirName').innerHTML=`«${esc(dirHandle.name)}» <span style="color:var(--acc)">(chiederà il permesso al primo salvataggio)</span>`;return;}
+    await withTimeout(dirHandle.entries().next(),8000);setDirState('ok');
+    loadLocalReg().then(()=>{if(localReg.length)writeSharedReg();});
+  }catch(e){setDirState('down');}
+}
+
+/* ---------- registro dei robot (unicità anche tra PC diversi) ---------- */
+let PCID=null,localReg=null;
+async function getPcId(){if(PCID)return PCID;try{PCID=await idb.get('pcid');}catch(e){}if(!PCID){PCID='PC-'+Math.random().toString(36).slice(2,6).toUpperCase();try{await idb.set('pcid',PCID);}catch(e){}}return PCID;}
+async function loadLocalReg(){if(localReg)return localReg;try{localReg=(await idb.get('reg'))||[];}catch(e){localReg=[];}return localReg;}
+async function regDir(){if(!dirHandle)return null;if(!(await ensurePerm(dirHandle)))return null;return dirHandle.getDirectoryHandle('_registro',{create:true});}
+async function applyEpoch(ep){
+  if(!ep)return;let mine=null;try{mine=await idb.get('regEpoch');}catch(e){}
+  if(mine!==ep){await loadLocalReg();localReg=[];try{await idb.set('reg',[]);await idb.set('regEpoch',ep);}catch(e){}}
+}
+async function flushReg(){
+  if(!driveOn())return;await loadLocalReg();const pend=localReg.filter(e=>!e.up);if(!pend.length)return;
+  try{await driveCall('register',{entries:pend.map(({up,...e})=>e)},8000);pend.forEach(e=>e.up=true);try{await idb.set('reg',localReg);}catch(e){}}
+  catch(e){DRV.ok=false;DRV.err=e.message;showDrive();}
+}
+async function readSharedReg(){
+  if(driveOn()){try{const j=await driveCall('registry',{},DRV.ok===false?4000:8000);DRV.ok=true;await applyEpoch(j.epoch);return j.entries||[];}catch(e){DRV.ok=false;DRV.err=e.message;showDrive();setDirState('down');return[];}}
+  if(!dirHandle)return[];
+  try{return await withTimeout((async()=>{
+    const rd=await regDir();if(!rd)return[];const out=[];let ep=null;
+    for await(const [n,h] of rd.entries())if(h.kind==='file'&&n.endsWith('.json')){try{const a=JSON.parse(await (await h.getFile()).text());if(n==='_epoca.json')ep=a.epoca;else if(Array.isArray(a))out.push(...a);}catch(e){}}
+    if(ep){let mine=null;try{mine=await idb.get('regEpoch');}catch(e){}
+      if(mine!==ep){await loadLocalReg();localReg=[];try{await idb.set('reg',[]);await idb.set('regEpoch',ep);}catch(e){}}}   // il docente ha azzerato il registro: questo PC si allinea
+    return out;})(),5000);}
+  catch(e){setDirState('down');return[];}
+}
+async function writeSharedReg(){
+  if(!dirHandle)return;
+  try{await withTimeout((async()=>{const rd=await regDir();if(!rd)return;const fh=await rd.getFileHandle((await getPcId())+'.json',{create:true});const w=await fh.createWritable();await w.write(JSON.stringify(localReg));await w.close();})(),5000);}
+  catch(e){setDirState('down');}
+}
+async function fullRegistry(){
+  const sh=await readSharedReg(),loc=await loadLocalReg(),m=new Map();
+  for(const e of [...sh,...loc])m.set(e.pc+'|'+e.t,e);
+  return[...m.values()];
+}
+async function register(id){
+  await loadLocalReg();
+  localReg.push({name:id.kid.toLowerCase(),show:id.show,k:id.serial,full:id.full,sig:id.sig,t:Date.now(),pc:await getPcId()});
+  try{await idb.set('reg',localReg);}catch(e){}
+  if(driveOn())await flushReg();   // i robot creati mentre Drive non rispondeva vengono inviati alla prima occasione
+  else await writeSharedReg();     // il file di questo PC contiene sempre l'elenco completo: si risincronizza da solo
+}
+
+async function openCert(){
+  if(!ID)return;
+  $('certDraw').checked=trailInk;$('certDraw').disabled=!trailInk;
+  $('certDraw').parentElement.style.opacity=trailInk?1:.45;
+  $('certMsg').textContent=trailInk?'':'Esegui un programma per poter aggiungere il tuo disegno.';$('certMsg').className='';
+  await document.fonts.ready;
+  renderCert(trailInk&&$('certDraw').checked);
+  $('certPrev').src=certCv.toDataURL('image/jpeg',.85);
+  $('certModal').classList.add('on');
+}
+$('certBtn').onclick=openCert;$('certBtn2').onclick=openCert;
+$('certClose').onclick=()=>$('certModal').classList.remove('on');
+$('certModal').onclick=e=>{if(e.target.id==='certModal')$('certModal').classList.remove('on');};
+$('certDraw').onchange=()=>{renderCert($('certDraw').checked);$('certPrev').src=certCv.toDataURL('image/jpeg',.85);};
+$('certSave').onclick=async()=>{
+  const msg=$('certMsg');msg.className='';msg.textContent='Preparo il PDF…';
+  try{
+    renderCert(trailInk&&$('certDraw').checked);
+    const blob=await new Promise(r=>certCv.toBlob(r,'image/jpeg',.93));
+    const jpg=new Uint8Array(await blob.arrayBuffer());
+    const pdf=pagesToPdf([{jpg,w:certCv.width,h:certCv.height}],`Robot Coder - ${ID.kid}`);
+    const fname=`${stamp()}_${ID.kid.replace(/ /g,'_')}_${ID.sigla}.pdf`;
+    const r=await saveFile(fname,pdf);msg.innerHTML=r.html;msg.className=r.warn?'warn':'ok';r.warn?sfx.bonk():sfx.ok();
+  }catch(e){console.error(e);msg.className='bad';msg.textContent=e.message||'Errore nella creazione del PDF.';}
+};
+
+/* ---------- docente: unisci i ricordi ---------- */
+let mergeList=[],mergeDir=null,mergeFromDrive=false;
+function mergeInfo(){
+  $('mInfo').innerHTML=mergeList.length?`Trovati <b>${mergeList.length}</b> ricordi${mergeFromDrive?' nella cartella Drive':mergeDir?` nella cartella «${mergeDir.name}»`:''}.<br><small>${mergeList.slice(0,4).map(f=>f.name).join('<br>')}${mergeList.length>4?'<br>…':''}</small>`:'Nessun ricordo selezionato.';
+  $('mGo').disabled=!mergeList.length;
+}
+$('mergeBtn').onclick=()=>{mergeList=[];mergeDir=null;mergeFromDrive=false;showDrive();$('mMsg').textContent='';$('mMsg').className='';mergeInfo();$('mDir').classList.toggle('hidden',!FS_OK);$('mergeModal').classList.add('on');};
+$('mClose').onclick=()=>$('mergeModal').classList.remove('on');
+$('mergeModal').onclick=e=>{if(e.target.id==='mergeModal')$('mergeModal').classList.remove('on');};
+const isRicordo=n=>/\.pdf$/i.test(n)&&!/^Ricordi_OpenDay/i.test(n);
+$('mDir').onclick=async()=>{
+  try{
+    const h=await window.showDirectoryPicker({id:'ricordi',mode:'readwrite'});mergeDir=h;mergeList=[];
+    for await(const [name,fh] of h.entries())if(fh.kind==='file'&&isRicordo(name))mergeList.push(await fh.getFile());
+    mergeList.sort((a,b)=>a.name.localeCompare(b.name));mergeInfo();
+  }catch(e){if(e&&e.name!=='AbortError')$('mMsg').textContent='Non riesco ad aprire la cartella.';}
+};
+$('mDrive').onclick=async()=>{
+  const m=$('mMsg');m.className='';m.textContent='Leggo la cartella Drive…';
+  try{const j=await driveCall('list',{},20000);mergeDir=null;mergeFromDrive=true;mergeList=j.files.filter(f=>isRicordo(f.name));m.textContent='';mergeInfo();}
+  catch(e){m.className='bad';m.textContent='Non riesco a leggere la cartella Drive: '+e.message;}
+};
+$('mFiles').onchange=e=>{mergeDir=null;mergeFromDrive=false;mergeList=[...e.target.files].filter(f=>isRicordo(f.name)).sort((a,b)=>a.name.localeCompare(b.name));mergeInfo();e.target.value='';};
+$('mGo').onclick=async()=>{
+  const msg=$('mMsg');msg.className='';msg.textContent='Unisco…';$('mGo').disabled=true;
+  try{
+    const pages=[];let skip=0;
+    for(const [i,f] of mergeList.entries()){
+      let u8;
+      if(f.id){msg.textContent=`Scarico da Drive ${i+1} di ${mergeList.length}…`;u8=b64ToBytes((await driveCall('get',{id:f.id},30000)).b64);}
+      else u8=new Uint8Array(await f.arrayBuffer());
+      const pg=extractPages(u8);if(pg.length)pages.push(...pg);else skip++;
+    }
+    msg.textContent='Unisco…';
+    if(!pages.length)throw new Error('Nessun ricordo di Robot Coder tra i file scelti.');
+    const pdf=pagesToPdf(pages,'Ricordi Open Day');
+    const fname=`Ricordi_OpenDay_${stamp()}_${pages.length}pagine.pdf`;
+    let r;
+    if(mergeFromDrive){await downloadFile(fname,pdf);r=await saveFile(fname,pdf,null,{merged:true});r.html=`✅ Scaricato in <b>Download</b> per la stampa.<br>`+r.html;}
+    else r=await saveFile(fname,pdf,mergeDir);
+    msg.innerHTML=r.html+`<br>${pages.length} pagine pronte da stampare.`+(skip?`<br><span style="color:var(--err)">${skip} file ignorati (non sono ricordi).</span>`:'');
+    msg.className=r.warn?'warn':'ok';sfx.ok();
+  }catch(e){console.error(e);msg.className='bad';msg.textContent=e.message||'Errore durante l\'unione.';}
+  $('mGo').disabled=!mergeList.length;
+};
+$('dirBtn').onclick=pickDir;
+
+/* =========================================================
+   AREA DOCENTE — nascosta e protetta da PIN
+   ========================================================= */
+let pinFails=0,pinLockUntil=0,memPin=null,pinMode='create';
+async function pinHash(p){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('robotcoder|'+p));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');}
+async function getPinHash(){try{return(await idb.get('pinHash'))||memPin;}catch(e){return memPin;}}
+async function setPinHash(h){memPin=h;try{await idb.set('pinHash',h);}catch(e){}}
+function tView(v){['tLock','tCreate','tPanel'].forEach(id=>$(id).classList.toggle('hidden',id!==v));}
+async function openTeach(){
+  if($('teachModal').classList.contains('on'))return;
+  ['tPin','tNew1','tNew2'].forEach(id=>$(id).value='');['tLockMsg','tCreateMsg','tPanelMsg'].forEach(id=>{$(id).textContent='';$(id).className='tmsg';});
+  const h=await getPinHash();
+  if(!h){pinMode='create';$('tCreateTxt').innerHTML='<b>Primo avvio su questo PC:</b> crea il PIN docente (almeno 4 cifre). Dallo anche allo studente tutor.';tView('tCreate');setTimeout(()=>$('tNew1').focus(),50);}
+  else{tView('tLock');setTimeout(()=>$('tPin').focus(),50);}
+  $('teachModal').classList.add('on');
+}
+function closeTeach(){$('teachModal').classList.remove('on');$('mergeModal').classList.remove('on');tView('tLock');}
+async function tryPin(){
+  const m=$('tLockMsg');
+  if(Date.now()<pinLockUntil){m.className='tmsg bad';m.textContent=`Troppi tentativi: riprova tra ${Math.ceil((pinLockUntil-Date.now())/1000)} s.`;return;}
+  const ok=(await pinHash($('tPin').value))===(await getPinHash());$('tPin').value='';
+  if(!ok){pinFails++;if(pinFails>=5){pinLockUntil=Date.now()+60000;pinFails=0;}m.className='tmsg bad';m.textContent='PIN sbagliato.';sfx.bonk();return;}
+  pinFails=0;await showPanel();
+}
+async function savePin(){
+  const a=$('tNew1').value,b=$('tNew2').value,m=$('tCreateMsg');m.className='tmsg bad';
+  if(!/^\d{4,12}$/.test(a)){m.textContent='Il PIN deve avere da 4 a 12 cifre.';return;}
+  if(a!==b){m.textContent='I due PIN non coincidono.';return;}
+  await setPinHash(await pinHash(a));
+  await showPanel();$('tPanelMsg').className='tmsg ok';$('tPanelMsg').textContent='✅ PIN salvato su questo PC.';
+}
+async function showPanel(){
+  tView('tPanel');showDir();checkDir();showDrive();if(driveOn())drivePing();
+  $('tRegInfo').textContent='…';
+  try{const all=await fullRegistry(),me=await getPcId();$('tRegInfo').textContent=`${all.filter(e=>e.pc===me).length} robot su questo PC (${me}) · ${all.length} in totale`;}
+  catch(e){$('tRegInfo').textContent='non disponibile';}
+}
+function confirmBtn(btn,label,fn){
+  btn.onclick=async()=>{
+    if(btn.dataset.armed!=='1'){btn.dataset.armed='1';const old=btn.textContent;btn.textContent='Sicuro? Clicca di nuovo';setTimeout(()=>{btn.dataset.armed='';btn.textContent=old;},4000);return;}
+    btn.dataset.armed='';btn.textContent=label;
+    const m=$('tPanelMsg');
+    try{m.className='tmsg ok';m.textContent=await fn();}catch(e){m.className='tmsg bad';m.textContent=e.message||'Operazione non riuscita.';}
+    showPanel();
+  };
+}
+confirmBtn($('tResetLocal'),'Solo questo PC',async()=>{localReg=[];try{await idb.set('reg',[]);}catch(e){}await writeSharedReg();return '✅ Registro di questo PC azzerato.';});
+confirmBtn($('tResetAll'),'Tutti i PC',async()=>{
+  if(driveOn()){const j=await driveCall('resetRegistry',{},15000);localReg=[];try{await idb.set('reg',[]);await idb.set('regEpoch',j.epoch);}catch(e){}return '✅ Registro azzerato su Drive per tutti i PC.';}
+  if(!dirHandle)throw new Error('Prima collega la cartella Drive (o una cartella locale): il registro comune sta lì.');
+  if(!(await ensurePerm(dirHandle)))throw new Error('Permesso sulla cartella negato.');
+  try{await dirHandle.removeEntry('_registro',{recursive:true});}catch(e){if(e.name!=='NotFoundError')throw e;}
+  const ep=Date.now().toString(36);
+  const rd=await dirHandle.getDirectoryHandle('_registro',{create:true});
+  const fh=await rd.getFileHandle('_epoca.json',{create:true});const w=await fh.createWritable();await w.write(JSON.stringify({epoca:ep}));await w.close();
+  localReg=[];try{await idb.set('reg',[]);await idb.set('regEpoch',ep);}catch(e){}
+  return '✅ Registro azzerato per tutti i PC (gli altri PC si allineano da soli al prossimo robot).';
+});
+$('tEnter').onclick=tryPin;$('tPin').onkeydown=e=>{if(e.key==='Enter')tryPin();};
+$('tCreateBtn').onclick=savePin;$('tNew2').onkeydown=e=>{if(e.key==='Enter')savePin();};
+$('tChangePin').onclick=()=>{$('tCreateTxt').textContent='Scegli il nuovo PIN docente per questo PC.';$('tNew1').value=$('tNew2').value='';$('tCreateMsg').textContent='';tView('tCreate');$('tNew1').focus();};
+$('tClose').onclick=closeTeach;
+$('teachModal').onclick=e=>{if(e.target.id==='teachModal')closeTeach();};
+document.addEventListener('keydown',e=>{
+  if(e.ctrlKey&&e.altKey&&(e.key==='d'||e.key==='D'||e.code==='KeyD')){e.preventDefault();openTeach();}
+  if(e.key==='Escape'&&$('teachModal').classList.contains('on')&&!$('mergeModal').classList.contains('on'))closeTeach();
+});
+(()=>{let t=null;const h=$('startTitle');
+  const start=()=>{clearTimeout(t);t=setTimeout(openTeach,2000);},stop=()=>clearTimeout(t);
+  h.addEventListener('pointerdown',start);['pointerup','pointerleave','pointercancel'].forEach(ev=>h.addEventListener(ev,stop));
+  h.addEventListener('contextmenu',e=>e.preventDefault());})();
+
+function enterMain(){
+  show('sMain');
+  $('hdrName').textContent=ID.full;$('hdrKid').textContent='il robot di '+ID.show;
+  $('fileName').textContent=ID.sigla.toLowerCase()+'_'+ID.nick.toLowerCase()+'.py';
+  ORIGINAL=defaultCode();ta.value=ORIGINAL;
+  stopFlag=false;clearError();resetRobot();clearTrail();setLine(0);
+  requestAnimationFrame(()=>{resizeArena();resizeScope();renderEditor();say(`Ciao ${ID.show}! Premi ▶ Esegui`,3500);speak(`Ciao ${ID.show}! Premi esegui`);});
+}
+
+window.addEventListener('load',()=>$('nameIn').focus());
+</script>
+</body>
+</html>
