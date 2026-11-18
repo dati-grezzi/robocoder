@@ -489,8 +489,8 @@ const hex2=n=>n.toString(16).toUpperCase().padStart(2,'0');
    Prima del confronto: minuscole, niente accenti, 4→a 3→e 1→i 0→o…,
    lettere doppie ridotte (cazzo → cazo).
    ========================================================= */
-const PAROLACCE=(()=>{const r=s=>s.replace(/[a-z]/g,c=>String.fromCharCode((c.charCodeAt(0)-84)%26+97));
-  return {rad:'pnm zreq fgebam chgna pbtyvba zvapuv insnaphy onfgneq vaphy cbzcva fobe mbpby sebpv evpuvba shpx ovgpu'.split(' ').map(r),par:new Set('phyb phyv svpn svtn svtur cveyn grggr arteb artev fuvg gebvn gebvr cbepbqvb cbepnznqban qvbpnar qvbcbepb qvborfgvn znqbanchgnan'.split(' ').map(r))};})();
+const PAROLACCE=(()=>{const r=s=>s.replace(/[a-z]/g,c=>String.fromCharCode((c.charCodeAt(0)-84)%26+97)).replace(/(.)\1+/g,'$1');   // decifra e riduce le doppie
+  return {rad:'pnm zreq fgebam chgna pbtyvba zvapuv insnaphy onfgneq vaphy cbzcva fobe mbpby sebpv evpuvba shpx ovgpu cbea fhppuvn'.split(' ').map(r),par:new Set('phyb phyv svpn svtn svtur cveyn grggr arteb artev fuvg gebvn gebvr cbepbqvb cbepnznqban qvbpnar qvbcbepb qvborfgvn znqbanchgnan crar crav cravf cvfryyb cvfryv intvan frffb frk frtn frtur fpbcner fpbcngn pnppn pnpn cvcv chch phybar phyrgb nff qvpx obbof mvar fhpn fhpnzv fprzb fprzn fghcvqb fghcvqn vqvbgn pergvab pergvan qrsvpvragr vzorpvyr zbatbyb evgneqngb evgneqngn onorb grgr'.split(' ').map(r))};})();
 function normParola(w){return String(w).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')
   .replace(/[0134578@$!|]/g,c=>({0:'o',1:'i',3:'e',4:'a',5:'s',7:'t',8:'b','@':'a','$':'s','!':'i','|':'i'})[c])
   .replace(/[^a-z]/g,'').replace(/(.)\1+/g,'$1');}
