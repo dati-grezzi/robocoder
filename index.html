@@ -482,6 +482,34 @@ const BODIES=['corpo largo','corpo alto','corpo tondo'];
 const MOUTHS=['sorriso','dentoni','bocca a O'];
 const hex2=n=>n.toString(16).toUpperCase().padStart(2,'0');
 
+/* =========================================================
+   FILTRO PAROLACCE: nel nome e in di("…").
+   Le parole sono in ROT13, così non compaiono in chiaro nel codice.
+   RAD = radici cercate dentro ogni parola; PAR = parole intere.
+   Prima del confronto: minuscole, niente accenti, 4→a 3→e 1→i 0→o…,
+   lettere doppie ridotte (cazzo → cazo).
+   ========================================================= */
+const PAROLACCE=(()=>{const r=s=>s.replace(/[a-z]/g,c=>String.fromCharCode((c.charCodeAt(0)-84)%26+97));
+  return {rad:'pnm zreq fgebam chgna pbtyvba zvapuv insnaphy onfgneq vaphy cbzcva fobe mbpby sebpv evpuvba shpx ovgpu'.split(' ').map(r),par:new Set('phyb phyv svpn svtn svtur cveyn grggr arteb artev fuvg gebvn gebvr cbepbqvb cbepnznqban qvbpnar qvbcbepb qvborfgvn znqbanchgnan'.split(' ').map(r))};})();
+function normParola(w){return String(w).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')
+  .replace(/[0134578@$!|]/g,c=>({0:'o',1:'i',3:'e',4:'a',5:'s',7:'t',8:'b','@':'a','$':'s','!':'i','|':'i'})[c])
+  .replace(/[^a-z]/g,'').replace(/(.)\1+/g,'$1');}
+function eParolaccia(w){const n=normParola(w);return !!n&&(PAROLACCE.par.has(n)||PAROLACCE.rad.some(x=>n.includes(x)));}
+const eCoppia=(a,b)=>PAROLACCE.par.has(normParola(a+b));   // due parole attaccate: solo parole intere ("porco dio"), non le radici
+/* parole del testo; le lettere staccate (c a z z o) si riuniscono in una parola sola */
+function paroleDi(s){const out=[];let run='';
+  for(const w of String(s).split(/[\s.,;:_\-'’"]+/).filter(Boolean)){
+    if(normParola(w).length<=1){run+=w;continue;}if(run){out.push(run);run='';}out.push(w);}
+  if(run)out.push(run);return out;}
+function haParolacce(s){const p=paroleDi(s);
+  return p.some(eParolaccia)||p.some((w,i)=>i<p.length-1&&eCoppia(w,p[i+1]));}   // anche "porco dio", "dio cane"
+/* per di("…"): ogni parolaccia diventa «bip» */
+function censura(s){s=String(s);if(!haParolacce(s))return s;
+  const w=s.split(/\s+/);
+  for(let i=0;i<w.length;i++){
+    if(eParolaccia(w[i]))w[i]='bip';
+    else if(i<w.length-1&&eCoppia(w[i],w[i+1])){w[i]='bip';w.splice(i+1,1);}}
+  const r=w.join(' ');return haParolacce(r)?'bip bip bip':r;}
 function cleanName(s){return s.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/['’\-_.]/g,' ').replace(/[^A-Za-z ]/g,'').replace(/\s+/g,' ').trim().slice(0,22).trim();}
 const LBL=b=>b===32?'␣':String.fromCharCode(b);
 /* palette neutra: niente rosa, magenta o viola (tonalità 260°–350° escluse) */
@@ -634,6 +662,7 @@ $('nameIn').addEventListener('keydown',e=>{if(e.key==='Enter')$('makeBtn').click
 $('makeBtn').onclick=async()=>{
   const raw=$('nameIn').value,c=cleanName(raw);
   if(c.replace(/ /g,'').length<2){$('nameMsg').textContent='Scrivi almeno 2 lettere 🙂';return;}
+  if(haParolacce(raw)||haParolacce(c)){$('nameMsg').textContent='Questo non è un nome! Scrivi il tuo vero nome 🙂';$('nameIn').select();return;}
   $('nameMsg').textContent='';$('makeBtn').disabled=true;$('makeBtn').textContent='Controllo il registro…';
   try{
     const L=await regLookup(c.toLowerCase());
@@ -1222,7 +1251,8 @@ async function turn(g,line){
 }
 async function cmd(s){
   const line=s.line,a=s.args.map(x=>ev(x,line));
-  {const src=`${s.name}(${s.args.map(x=>exStr(x,false)).join(', ')})`,val=`${s.name}(${a.map(fmtV).join(', ')})`;
+  if(s.name==='di')a[0]=censura(fmt(a[0]));          // le parolacce diventano «bip»
+  {const src=censura(`${s.name}(${s.args.map(x=>exStr(x,false)).join(', ')})`),val=`${s.name}(${a.map(fmtV).join(', ')})`;
    clog(line,`<b>${H(src)}</b>${src!==val?` → <span class="vv">${H(val)}</span>`:''}  <span class="ex">${explainCmd(s.name,a)}</span>`,s.name==='di'?'out':'');}
   emitSignal(`${s.name}(${a.map(v=>typeof v==='string'?`"${v}"`:fmt(v)).join(', ')})`,[OPC[s.name],...a.flatMap(valBytes)]);
   switch(s.name){
